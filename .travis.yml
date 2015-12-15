@@ -1,0 +1,4 @@
+install:
+    - sudo pip install tox
+
+script: make test
