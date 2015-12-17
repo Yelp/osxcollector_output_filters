@@ -11,7 +11,6 @@ from osxcollector.output_filters.base_filters.output_filter import _run_filter
 
 class RunFilterTest(T.TestCase):
 
-
     def run_test(self, create_filter, input_blobs=None, expected_output_blobs=None):
         """Mocks out stdin, stdout, and config then runs input lines through an OutputFilter.
 

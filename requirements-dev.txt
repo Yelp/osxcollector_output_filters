@@ -1,5 +1,6 @@
 -r requirements.txt
 coverage==3.7.1
+flake8==2.5.1
 mock==1.0.1
 pre-commit==0.5.2
 pyflakes==0.9.1

@@ -18,5 +18,3 @@ class BadDomainError(OutputFilterError):
 
     """An error to throw when a domain is invalid."""
     pass
-
-

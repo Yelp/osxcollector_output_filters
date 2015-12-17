@@ -4,7 +4,8 @@
 # LookupHashesFilter uses ShadowServer to lookup the values in 'sha1' and add 'osxcollector_shadowserver' key.
 #
 import os.path
-from threat_intel.shadowserver import ShadowServerApi 
+
+from threat_intel.shadowserver import ShadowServerApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.base_filters.threat_feed import ThreatFeedFilter
