@@ -1,5 +1,5 @@
 # OSXCollector Output Filters
-The `osxcollector.output_filters` package contains filters that process and transform the output of [https://github.com/Yelp/osxcollector](OSXCollector). The goal of filters is to make it easy to analyze OSXCollector output.
+The `osxcollector.output_filters` package contains filters that process and transform the output of [OSXCollector](https://github.com/Yelp/osxcollector). The goal of filters is to make it easy to analyze OSXCollector output.
 
 Each filter has a single purpose. They do one thing and they do it right.
 
@@ -461,11 +461,11 @@ AnalyzeFilter:
                         extensions.
 ```
 
-## Contributing to OSXCollector
+## Contributing to OSXCollector Output Filters
 We encourage you to extend the functionality of OSXCollector to suit your needs.
 
-### Testing OSXCollector
-A collection of tests for osxcollector is provided under the `tests` directory. In order to run these tests you must install [tox](https://pypi.python.org/pypi/tox):
+### Testing OSXCollector Output Filters
+A collection of tests for OSXCollector Output Filters is provided under the `tests` directory. In order to run these tests you must install [tox](https://pypi.python.org/pypi/tox):
 ```shell
 $ sudo pip install tox
 ```
