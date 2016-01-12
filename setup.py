@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from setuptools import find_packages
 from setuptools import setup
 
 setup(
@@ -10,7 +11,7 @@ setup(
     license="GNU General Public License",
     url="https://github.com/Yelp/osxcollector_output_filters",
     setup_requires="setuptools",
-    packages=["osxcollector"],
+    packages=find_packages(exclude=["tests"]),
     provides=["osxcollector"],
     install_requires=[
         "simplejson",
