@@ -7,3 +7,5 @@ config.yaml
 osxcollector.yaml
 virtualenv_run/
 .coverage
+dist/
+sdist/
