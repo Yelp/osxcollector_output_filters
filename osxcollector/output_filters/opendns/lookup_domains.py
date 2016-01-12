@@ -146,8 +146,8 @@ class LookupDomainsFilter(ThreatFeedFilter):
         content_categories = category_info['content_categories']
         security_categories = category_info['security_categories']
 
-        return self._is_category_info_suspicious(category_info) or (0 == status and 0 == len(content_categories)
-                                                                    and 0 == len(security_categories))
+        return self._is_category_info_suspicious(category_info) or \
+            (0 == status and 0 == len(content_categories) and 0 == len(security_categories))
 
     def _is_security_info_suspicious(self, security_info):
         """Analyzes info from OpenDNS and makes a boolean determination of suspicious or not.

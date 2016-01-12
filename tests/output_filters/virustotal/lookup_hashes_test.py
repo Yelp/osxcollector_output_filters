@@ -33,7 +33,7 @@ class LookupHashesFilterTest(RunFilterTest):
                     'md5': '0c71d8cedc8bbb2b619a76d1478c4348',
                     'scan_date': '2015-01-15 16:42:01',
                     'permalink': 'https://www.virustotal.com/file/'
-                    + 'b779bafdf61b74784f2d3601ed663d7476da9ad4182601b8ca54fd4fbe1aa302/analysis/1273894724/',
+                    'b779bafdf61b74784f2d3601ed663d7476da9ad4182601b8ca54fd4fbe1aa302/analysis/1273894724/',
                     'total': 40,
                     'positives': 40,
                     'response_code': 1
@@ -47,7 +47,7 @@ class LookupHashesFilterTest(RunFilterTest):
                     'md5': '06506cc06cf0167ea583de62c98eae2c',
                     'scan_date': '2010-05-15 03:38:44',
                     'permalink': 'https://www.virustotal.com/file/'
-                    + '6e87855371171d912dd866e8d7747bf965c80053f83259827a55826ca38a9360/analysis/1273894724/',
+                    '6e87855371171d912dd866e8d7747bf965c80053f83259827a55826ca38a9360/analysis/1273894724/',
                     'total': 40,
                     'positives': 40,
                     'response_code': 1
