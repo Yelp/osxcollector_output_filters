@@ -264,7 +264,7 @@ class _VeryReadableOutputFilter(OutputFilter):
             if blob['osxcollector_section'] in ['firefox', 'chrome'] and blob.get('osxcollector_subsection') == 'extensions':
                 self._extensions.append(blob)
 
-        return None
+        return blob
 
     def _write(self, msg, color=END_COLOR):
         if not self._monochrome:
