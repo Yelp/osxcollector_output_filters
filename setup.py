@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="osxcollector_output_filters",
-    version="1.0.3",
+    version="1.0.4",
     author="Yelp Security",
     author_email="opensource@yelp.com",
     description="Filters that process and transform the output of OSXCollector",
