@@ -131,12 +131,19 @@ def run_filter_main(output_filter_cls):
     parser = ArgumentParser(parents=argument_parents, conflict_handler='resolve')
     parser.add_argument('-i', '--input-file', dest='input_file', default=None,
                         help='[OPTIONAL] Path to OSXCollector output to read. Defaults to stdin otherwise.')
+    parser.add_argument('-o', '--output-file', dest='output_file', default=None,
+                        help='[OPTIONAL] Path where OSXCollector output augmented with the analysis results will be written to. Defaults to stdout otherwise.')
     args = parser.parse_args()
 
     output_filter = output_filter_cls(**vars(args))
 
+    fp_in = open(args.input_file, 'r') if args.input_file else None
+    fp_out = open(args.output_file, 'w') if args.output_file else None
+
+    _run_filter(output_filter, input_stream=fp_in, output_stream=fp_out)
+
     if args.input_file:
-        with(open(args.input_file, 'r')) as fp_in:
-            _run_filter(output_filter, input_stream=fp_in)
-    else:
-        _run_filter(output_filter)
+        fp_in.close()
+
+    if args.output_file:
+        fp_out.close()

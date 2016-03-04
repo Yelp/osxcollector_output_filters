@@ -27,8 +27,6 @@ import sys
 from argparse import ArgumentParser
 from numbers import Number
 
-import simplejson
-
 from osxcollector.output_filters.base_filters.chain import ChainFilter
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -89,9 +87,6 @@ class AnalyzeFilter(ChainFilter):
             # Sort browser history for maximum pretty
             filter_chain.append(FirefoxHistoryFilter(**kwargs))
             filter_chain.append(ChromeHistoryFilter(**kwargs))
-
-            # Summarize what has happened
-            filter_chain.append(_OutputToFileFilter(**kwargs))
 
         filter_chain.append(_VeryReadableOutputFilter(**kwargs))
 
@@ -162,46 +157,6 @@ class AnalyzeFilter(ChainFilter):
         if '' == blob.get('md5', None):
             return True
         return any([key in blob for key in ['osxcollector_vthash', 'osxcollector_related']])
-
-
-class _OutputToFileFilter(OutputFilter):
-
-    def __init__(self, **kwargs):
-        super(_OutputToFileFilter, self).__init__(**kwargs)
-        self._all_blobs = list()
-
-    def filter_line(self, blob):
-        """Each Line of OSXCollector output will be passed to filter_line.
-
-        The OutputFilter should return the line, either modified or unmodified.
-        The OutputFilter can also choose to return nothing, effectively swallowing the line.
-
-        Args:
-            output_line: A dict
-
-        Returns:
-            A dict or None
-        """
-        self._all_blobs.append(blob)
-        return None
-
-    def end_of_lines(self):
-        """Called after all lines have been fed to filter_output_line.
-
-        The OutputFilter can do any batch processing on that requires the complete input.
-
-        Returns:
-            An array of dicts (empty array if no lines remain)
-        """
-        if len(self._all_blobs):
-            incident_id = self._all_blobs[0]['osxcollector_incident_id']
-
-            with open('./analyze_{0}.json'.format(incident_id), 'w') as fp:
-                for blob in self._all_blobs:
-                    fp.write(simplejson.dumps(blob))
-                    fp.write('\n')
-
-        return self._all_blobs
 
 
 class _VeryReadableOutputFilter(OutputFilter):
