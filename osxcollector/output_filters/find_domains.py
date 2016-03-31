@@ -3,6 +3,7 @@
 #
 # FindDomainsFilter looks for domains in all input lines and adds those domains into the 'osxcollector_domains' key.
 #
+import logging
 import re
 from urllib import unquote_plus
 from urlparse import urlsplit
@@ -76,9 +77,13 @@ class FindDomainsFilter(OutputFilter):
         if self.SCHEMES.match(maybe_url):
             url = unquote_plus(maybe_url)
 
-            split_url = urlsplit(url)
-            if split_url.hostname:
-                return split_url.hostname
+            try:
+                split_url = urlsplit(url)
+                if split_url.hostname:
+                    return split_url.hostname
+            # in case "url" is not a valid URL, just log a message
+            except ValueError as e:
+                logging.info('Cannot split the URL: {0}. Hint: {1}'.format(url, e))
 
         return None
 
