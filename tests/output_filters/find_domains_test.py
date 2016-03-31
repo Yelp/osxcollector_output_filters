@@ -163,3 +163,8 @@ class FindDomainsFilterTest(RunFilterTest):
             'www.example.com'
         ]
         self._run_test(input_blob, expected_domains)
+
+    def test_not_valid_url(self):
+        input_blob = {'term': 'https://blah.bork.yarn.dorn-duh-%5DYYYY.WW,boo:bloom,fizz:(ault:(akh_ugh:!it,pook:NOOM)),rort:!(\'@tuht\',dort))'}
+        expected_domains = None
+        self._run_test(input_blob, expected_domains)
