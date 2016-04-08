@@ -451,9 +451,9 @@ opendns.RelatedDomainsFilter:
 AnalyzeFilter:
   --readout             [OPTIONAL] Skip the analysis and just output really
                         readable analysis
-  --no-opendns          [OPTIONAL] Don\'t run OpenDNS filters
-  --no-virustotal       [OPTIONAL] Don\'t run VirusTotal filters
-  --no-shadowserver     [OPTIONAL] Don\'t run ShadowServer filters
+  --no-opendns          [OPTIONAL] Don't run OpenDNS filters
+  --no-virustotal       [OPTIONAL] Don't run VirusTotal filters
+  --no-shadowserver     [OPTIONAL] Don't run ShadowServer filters
   -M, --monochrome      [OPTIONAL] Output monochrome analysis
   --show-signature-chain
                         [OPTIONAL] Output unsigned startup items and kexts.
