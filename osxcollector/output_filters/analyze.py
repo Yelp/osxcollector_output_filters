@@ -79,9 +79,9 @@ class AnalyzeFilter(ChainFilter):
                 filter_chain.append(OpenDnsRelatedDomainsFilter(related_when=AnalyzeFilter.find_related_when, **kwargs))
 
             # Lookup threat info on suspicious and related stuff
-            if not no_virustotal:
-                filter_chain.append(OpenDnsLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs))
             if not no_opendns:
+                filter_chain.append(OpenDnsLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs))
+            if not no_virustotal:
                 filter_chain.append(VtLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_domains_in_vt_when, **kwargs))
 
             # Sort browser history for maximum pretty
