@@ -2,9 +2,11 @@
 #
 # Utilities for dealing with blacklists
 #
+import logging
 import re
 from collections import namedtuple
 
+from osxcollector.output_filters.exceptions import BadDomainError
 from osxcollector.output_filters.exceptions import MissingConfigError
 from osxcollector.output_filters.util.dict_utils import DictUtils
 from osxcollector.output_filters.util.domains import clean_domain
@@ -64,6 +66,7 @@ class Blacklist(object):
                     self._blacklisted_values.append(line)
 
         self._blacklisted_values = [self._convert_to_matching_term(val) for val in self._blacklisted_values]
+        self._blacklisted_values = filter(None, self._blacklisted_values)
 
     def _read_blacklist_file_contents(self):
         try:
@@ -84,7 +87,14 @@ class Blacklist(object):
         display_name = blacklisted_value
 
         if self._is_domains:
-            domain = clean_domain(blacklisted_value)
+            try:
+                domain = clean_domain(blacklisted_value)
+            except BadDomainError:
+                logging.warning(
+                    'Blacklisted value "{0}" cannot be resolved as a domain name'
+                    .format(blacklisted_value))
+                return None
+
             blacklisted_value = '^(.+\.)*{0}$'.format(re.escape(domain))
 
         if self._is_regex:

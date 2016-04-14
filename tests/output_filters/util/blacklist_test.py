@@ -2,12 +2,12 @@
 from copy import deepcopy
 
 import testify as T
+from mock import call
 from mock import patch
 
 from osxcollector.output_filters.exceptions import MissingConfigError
 from osxcollector.output_filters.util.blacklist import Blacklist
 from osxcollector.output_filters.util.blacklist import create_blacklist
-from osxcollector.output_filters.util.domains import BadDomainError
 
 
 class CreateBlacklistTest(T.TestCase):
@@ -74,8 +74,20 @@ class CreateBlacklistTest(T.TestCase):
 
     def test_bad_domains(self):
         self._blacklist_data['blacklist_is_domains'] = True
-        with T.assert_raises(BadDomainError):
-            create_blacklist(self._blacklist_data)
+        with patch('logging.warning', autospec=True) as patched_logging_warning:
+            blacklist = create_blacklist(self._blacklist_data)
+
+        T.assert_equal(4, patched_logging_warning.call_count)
+        calls = [
+            call('Blacklisted value "apple" cannot be resolved as a domain name'),
+            call('Blacklisted value "banana" cannot be resolved as a domain name'),
+            call('Blacklisted value "corolla" cannot be resolved as a domain name'),
+            call('Blacklisted value "datsun" cannot be resolved as a domain name'),
+        ]
+        T.assert_equal(calls, patched_logging_warning.call_args_list)
+
+        blob = {'fruit_name': 'apple.com'}
+        T.assert_equal(bool(blacklist.match_line(blob)), False)
 
     def test_match_fruit(self):
         good_blobs = [
