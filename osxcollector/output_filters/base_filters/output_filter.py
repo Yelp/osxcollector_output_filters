@@ -120,7 +120,7 @@ def _run_filter(output_filter, input_stream=None, output_stream=None, *args, **k
 
 
 def run_filter_main(output_filter_cls):
-    """A `main` method with runs an OutputFilter.
+    """A `main` method which runs an OutputFilter.
 
     Args:
         output_filter_cls: Class name of the OutputFilter
