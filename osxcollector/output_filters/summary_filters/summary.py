@@ -21,10 +21,24 @@ class SummaryFilter(OutputFilter):
 
         self._add_to_blacklist = []
 
-        self._summary_output_file = summary_output_file
+        self._close_file = False
 
-        self._output_stream = open(summary_output_file, 'w') if summary_output_file else sys.stdout
+        self._open_output_stream(summary_output_file)
+
+    def _open_output_stream(self, summary_output_file):
+        if summary_output_file:
+            if isinstance(summary_output_file, basestring):
+                self._output_stream = open(summary_output_file, 'w')
+                self._close_file = True
+            else:
+                # not a string, most likely already opened output stream
+                self._output_stream = summary_output_file
+        else:
+            self._output_stream = sys.stdout
 
     def __del__(self):
-        if self._summary_output_file:
+        self._close_output_stream()
+
+    def _close_output_stream(self):
+        if self._close_file:
             self._output_stream.close()
