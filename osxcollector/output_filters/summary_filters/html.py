@@ -55,7 +55,7 @@ class HtmlSummaryFilter(SummaryFilter):
             self._output_stream.write(text.encode('utf-8', errors='ignore'))
         except UnicodeDecodeError as err:
             self._output_stream.write(text)
-            sys.stderr.write('Unicode decode error: {0}'.format(err))
+            sys.stderr.write(u'Unicode decode error: {0}'.format(err))
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.
@@ -222,11 +222,11 @@ class HtmlSummaryFilter(SummaryFilter):
 
             if 'osxcollector_blacklist' in blob:
                 for key in blob['osxcollector_blacklist'].keys():
-                    self._summarize_val('blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
+                    self._summarize_val(u'blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
 
             if 'osxcollector_related' in blob:
                 for key in blob['osxcollector_related'].keys():
-                    self._summarize_val('related-{0}'.format(key), blob['osxcollector_related'][key])
+                    self._summarize_val(u'related-{0}'.format(key), blob['osxcollector_related'][key])
 
             if 'md5' in blob and '' == blob['md5']:
                 add_to_blacklist = True
@@ -251,7 +251,7 @@ class HtmlSummaryFilter(SummaryFilter):
         section = blob.get('osxcollector_section')
         subsection = blob.get('osxcollector_subsection', '')
 
-        self._print_header('{0} {1}'.format(section, subsection), level=3)
+        self._print_header(u'{0} {1}'.format(section, subsection), level=3)
         self._write('<ul class="list">')
         for key in sorted(blob.keys()):
             if not key.startswith('osxcollector') and blob.get(key):
@@ -268,7 +268,7 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._summarize_val(key, val, 'vthash')
                 self._write('</li>')
             permalink = blob.get('permalink')
-            self._write('<li><a href="{0}" target="_blank">{0}</a></li>'.format(permalink))
+            self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(permalink))
 
     def _summarize_vtdomain(self, blob):
         for blob in blob['osxcollector_vtdomain']:
@@ -286,17 +286,17 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._summarize_val(key, val, 'opendns')
                 self._write('</li>')
             link = blob.get('link')
-            self._write('<li><a href="{0}" target="_blank">{0}</a></li>'.format(link))
+            self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(link))
 
     def _summarize_val(self, key, val, prefix=None):
         self._print_key(key, prefix)
         self._print_val(val)
 
     def _print_header(self, text, level=1):
-        self._write('<h{0}>{1}</h{0}>'.format(level, text))
+        self._write(u'<h{0}>{1}</h{0}>'.format(level, text))
 
     def _print_para(self, text):
-        self._write('<p>{0}</p>'.format(text))
+        self._write(u'<p>{0}</p>'.format(text))
 
     def _print_list_item(self, item):
         self._write('<li>')
@@ -309,7 +309,7 @@ class HtmlSummaryFilter(SummaryFilter):
         else:
             prefix += '-'
 
-        self._write('<span class="key">{0}{1}</span>: '.format(prefix, key))
+        self._write(u'<span class="key">{0}{1}</span>: '.format(prefix, key))
 
     def _print_val(self, val):
         if isinstance(val, list):
@@ -327,4 +327,4 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._write('</li>')
             self._write('</ul>')
         elif isinstance(val, basestring) or isinstance(val, Number):
-            self._write('<span class="val">{0}</span>'.format(val))
+            self._write(u'<span class="val">{0}</span>'.format(val))
