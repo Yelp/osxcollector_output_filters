@@ -55,7 +55,9 @@ class HtmlSummaryFilter(SummaryFilter):
             self._output_stream.write(text.encode('utf-8', errors='ignore'))
         except UnicodeDecodeError as err:
             self._output_stream.write(text)
-            sys.stderr.write(u'Unicode decode error: {0}'.format(err))
+            sys.stderr.write(
+                'Unicode decode error when processing text:\n{0}\nError:\n{1}'
+                '\n'.format(text, err))
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.
