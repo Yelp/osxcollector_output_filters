@@ -335,9 +335,7 @@ class HtmlSummaryFilter(SummaryFilter):
             self._encode_val(val)
 
     def _encode_val(self, val):
-        try:
+        if not isinstance(val, unicode):
             val = unicode(val, errors='replace')
-        except TypeError as err:
-            sys.stderr.write('TypeError raised when converting to unicode: {0}\n'.format(err))
 
         self._write(u'<span class="val">{0}</span>'.format(val))
