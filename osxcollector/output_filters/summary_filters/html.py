@@ -327,4 +327,11 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._write('</li>')
             self._write('</ul>')
         elif isinstance(val, basestring) or isinstance(val, Number):
+            self._encode_val(val)
+
+    def _encode_val(self, val):
+        try:
             self._write(u'<span class="val">{0}</span>'.format(val))
+        except UnicodeDecodeError as err:
+            sys.stderr.write('Unicode decode error while processing the value: {0}\n{1}\n'.format(val, err))
+            self._write('<span class="val">{0}</span>'.format(val))
