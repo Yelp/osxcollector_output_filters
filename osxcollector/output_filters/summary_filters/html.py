@@ -52,10 +52,12 @@ class HtmlSummaryFilter(SummaryFilter):
 
     def _write(self, text):
         try:
-            self._output_stream.write(text.encode('utf-8', errors='ignore'))
+            self._output_stream.write(text.encode('utf-8', errors='replace'))
         except UnicodeDecodeError as err:
             self._output_stream.write(text)
-            sys.stderr.write(u'Unicode decode error: {0}'.format(err))
+            sys.stderr.write(
+                'Unicode decode error when encoding text:\n{0}\nError:\n{1}\n'
+                .format(text, err))
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.
@@ -326,5 +328,14 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._print_val(val[key])
                 self._write('</li>')
             self._write('</ul>')
-        elif isinstance(val, basestring) or isinstance(val, Number):
-            self._write(u'<span class="val">{0}</span>'.format(val))
+        elif isinstance(val, Number):
+            val = str(val)
+            self._encode_val(val)
+        elif isinstance(val, basestring):
+            self._encode_val(val)
+
+    def _encode_val(self, val):
+        if not isinstance(val, unicode):
+            val = unicode(val, errors='replace')
+
+        self._write(u'<span class="val">{0}</span>'.format(val))
