@@ -14,10 +14,10 @@ $ source virtualenv_run/bin/activate
 ```
 
 ## Filter Configuration
-Many filters require configuration, like API keys or details on a blacklist. The configuration for filters is done in a YAML file. The file is named `osxcollector.yaml`. The filter will look for the config file in:
+Many filters require configuration, like API keys or details on a blacklist. The configuration for filters is done in a YAML file. The file is named `osxcollector.yaml`. The filter will look for the configuration file in:
 - The current directory.
-- The user's home directory
-- The path pointed to by the environment variable OSXCOLLECTOR_CONF
+- The user's home directory.
+- The path pointed to by the environment variable `OSXCOLLECTOR_CONF`.
 
 A sample config is included. Make a copy and then modify if for yourself:
 ```shell
