@@ -257,42 +257,36 @@ class HtmlSummaryFilter(SummaryFilter):
         self._write('<ul class="list">')
         for key in sorted(blob.keys()):
             if not key.startswith('osxcollector') and blob.get(key):
-                self._write('<li>')
                 val = blob.get(key)
                 self._summarize_val(key, val)
-                self._write('</li>')
 
     def _summarize_vthash(self, blob):
         for blob in blob['osxcollector_vthash']:
             for key in ['positives', 'total', 'scan_date']:
-                self._write('<li>')
                 val = blob.get(key)
                 self._summarize_val(key, val, 'vthash')
-                self._write('</li>')
             permalink = blob.get('permalink')
             self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(permalink))
 
     def _summarize_vtdomain(self, blob):
         for blob in blob['osxcollector_vtdomain']:
             for key in ['domain', 'detections']:
-                self._write('<li>')
                 val = blob.get(key)
                 self._summarize_val(key, val, 'vtdomain')
-                self._write('</li>')
 
     def _summarize_opendns(self, blob):
         for blob in blob['osxcollector_opendns']:
             for key in ['domain', 'categorization', 'security']:
-                self._write('<li>')
                 val = blob.get(key)
                 self._summarize_val(key, val, 'opendns')
-                self._write('</li>')
             link = blob.get('link')
             self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(link))
 
     def _summarize_val(self, key, val, prefix=None):
+        self._write('<li>')
         self._print_key(key, prefix)
         self._print_val(val)
+        self._write('</li>')
 
     def _print_header(self, text, level=1):
         self._write(u'<h{0}>{1}</h{0}>'.format(level, text))
@@ -323,10 +317,7 @@ class HtmlSummaryFilter(SummaryFilter):
             self._write('<ul class="dict">')
             keys = val.keys()
             for key in keys:
-                self._write('<li>')
-                self._print_key(key)
-                self._print_val(val[key])
-                self._write('</li>')
+                self._summarize_val(key, val[key])
             self._write('</ul>')
         elif isinstance(val, Number):
             val = str(val)
