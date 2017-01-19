@@ -106,28 +106,38 @@ class HtmlSummaryFilter(SummaryFilter):
         self._write('<ul id="toc">')
 
         if len(self._vthash):
-            self._write('<li><a href="#vthash">VirusTotal bad hash hits</a></li>')
+            self._print_section_link(
+                "vthash", "VirusTotal bad hash hits", len(self._vthash))
 
         if len(self._vtdomain):
-            self._write('<li><a href="#vtdomain">VirusTotal bad domain hits</a></li>')
+            self._print_section_link(
+                "vtdomain", "VirusTotal bad domain hits", len(self._vtdomain))
 
         if len(self._opendns):
-            self._write('<li><a href="#opendns">OpenDNS Investigate hits</a></li>')
+            self._print_section_link(
+                "opendns", "OpenDNS Investigate hits", len(self._opendns))
 
         if len(self._blacklist):
-            self._write('<li><a href="#blacklist">Blacklist hits</a></li>')
+            self._print_section_link(
+                "blacklist", "Blacklist hits", len(self._blacklist))
 
         if len(self._related):
-            self._write('<li><a href="#related">Related hits</a></li>')
+            self._print_section_link(
+                "related", "Related hits", len(self._related))
 
         if len(self._signature_chain):
-            self._write('<li><a href="#signature_chain">Signature chain</a></li>')
+            self._print_section_link(
+                "signature_chain", "Signature chain",
+                len(self._signature_chain))
 
         if len(self._extensions):
-            self._write('<li><a href="#extensions">Extensions</a></li>')
+            self._print_section_link(
+                "extensions", "Extensions", len(self._extensions))
 
         if len(self._add_to_blacklist):
-            self._write('<li><a href="#add_to_blacklist">Blacklist update suggestions</a></li>')
+            self._print_section_link(
+                "add_to_blacklist", "Blacklist update suggestions",
+                len(self._add_to_blacklist))
 
         self._write('</ul>')
 
@@ -204,8 +214,12 @@ class HtmlSummaryFilter(SummaryFilter):
 
         return []
 
+    def _print_section_link(self, section, title, size):
+        self._write('<li><a href="#{0}">{1}</a> ({2})</li>'.format(
+            section, title, size))
+
     def _summarize_blobs(self, blobs):
-        self._write('<ul class="blobs">')
+        self._write('<ol class="blobs">')
         for blob in blobs:
             self._write('<li>')
             self._summarize_line(blob)
@@ -247,7 +261,7 @@ class HtmlSummaryFilter(SummaryFilter):
                         self._add_to_blacklist.append(('domain', domain))
             self._write('</ul>')  # this is the end of the list started by "_summarize_line"
             self._write('</li>')
-        self._write('</ul>')
+        self._write('</ol>')
 
     def _summarize_line(self, blob):
         section = blob.get('osxcollector_section')
