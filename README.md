@@ -1,3 +1,5 @@
+[![PyPI](https://img.shields.io/pypi/v/osxcollector_output_filters.svg)](https://pypi.python.org/pypi/osxcollector_output_filters)
+
 # OSXCollector Output Filters
 The `osxcollector.output_filters` package contains filters that process and transform the output of [OSXCollector](https://github.com/Yelp/osxcollector). The goal of filters is to make it easy to analyze OSXCollector output.
 
