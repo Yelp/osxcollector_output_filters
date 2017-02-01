@@ -1,4 +1,13 @@
 install:
-    - sudo pip install tox
-
+- sudo pip install tox
 script: make test
+deploy:
+  provider: pypi
+  user: yelplabs
+  password:
+    secure: O/8Fwyp4Hy1G0OAgoueVdGVarsCYNCI+/eFvlobJlEXaSJ+yBkYGJgN+tjRiwRkuk0f1Z7/jFFucvgnW+6NlM1yvtMLNRgqiqryXqabE55h+wBof9VpirIxmFeM8EXuB/pPOh7kzDIj8wG/ZUibT5z9HJH3g959KfogJlRkKZwXp8vG8kBErI5Qrw5emMz6PbyWwdDUjdXMuLXCa3v0kq7SDHV40qnH0YjjP6tWlTi8pT7lJKLtC6lrUOkDEL2CBM6qDeWH7ww8vtcPGX3ytVhtf1fnsl4I3Gc1BkP0WyskzGxyNMBr7P8Hpx3EfC/mQDt40aJMOCVRJyWLC3c6yM3WnwCdVobtK7ianfDD3ayNvhlwAZIH3vYOUJfheVgT/U7Y8xvVUV9phkn7aeDmyRzc4hkgAJFvfo2U4TdH7A43fyVx8pPBpboBAheuFYQ903caON3irw0TgErpsMvP9sXP3Ox0JNOsHB/YR0UyU3/t9yfHA7G8oWqoDFMhJGs91lTMYn0eZp7cRk/9GA5X/wL70spAWt0W9Irk8Wq8jTK1Tp5m0v/lgxSFO7HiypCofra10bkwXIXah0dfdaFg3SGl4CF0GPUM93XSq6VV/jmMQReiD3WBjZrVG3h0N7/vPwtXvYgUqszoWCTjlhz8mBmVwcLAf2Kr/SQFG0nofk6M=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: Yelp/osxcollector_output_filters
+    branch: pypi-autodeploy
