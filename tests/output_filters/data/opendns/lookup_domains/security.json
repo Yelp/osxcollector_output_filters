@@ -1,0 +1,80 @@
+{
+    "bango.com": null,
+    "dango.com": {
+        "dga_score": 0,
+        "geodiversity_normalized": [
+            [
+                "IS",
+                0.9996267573230843
+            ],
+            [
+                "US",
+                0.0003732426769157135
+            ]
+        ],
+        "asn_score": -0.1608560065526172,
+        "rip_score": 0,
+        "securerank2": 0.04721624022600212,
+        "popularity": 0,
+        "geoscore": 0,
+        "ks_test": 0,
+        "prefix_score": 0,
+        "attack": "",
+        "pagerank": 0,
+        "geodiversity": [
+            [
+                "IS",
+                0.5
+            ],
+            [
+                "US",
+                0.5
+            ]
+        ],
+        "found": true,
+        "perplexity": 0.3866686930931377,
+        "entropy": 3.5351745656359026,
+        "fastflux": false,
+        "threat_type": "",
+        "tld_geodiversity": []
+    },
+    "dingo.com": {
+        "dga_score": 0,
+        "geodiversity_normalized": [
+            [
+                "IS",
+                0.9996267573230843
+            ],
+            [
+                "US",
+                0.0003732426769157135
+            ]
+        ],
+        "asn_score": -0.1608560065526172,
+        "rip_score": 0,
+        "securerank2": 0.04721624022600212,
+        "popularity": 0,
+        "geoscore": 0,
+        "ks_test": 0,
+        "prefix_score": 0,
+        "attack": "",
+        "pagerank": 0,
+        "geodiversity": [
+            [
+                "IS",
+                0.5
+            ],
+            [
+                "US",
+                0.5
+            ]
+        ],
+        "found": true,
+        "perplexity": 0.3866686930931377,
+        "entropy": 3.5351745656359026,
+        "fastflux": false,
+        "threat_type": "",
+        "tld_geodiversity": []
+    },
+    "bingo.com": null
+}

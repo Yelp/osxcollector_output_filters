@@ -1,0 +1,22 @@
+[[{
+    "domain": "dango.com",
+    "categorization": {
+        "status": 0,
+        "content_categories": [
+            "Phishing"
+        ],
+        "security_categories": [],
+        "suspicious": true
+    },
+    "link": "https://investigate.opendns.com/domain-view/name/dango.com/view",
+    "security": {
+        "dga_score": 0,
+        "asn_score": -0.1608560065526172,
+        "rip_score": 0,
+        "securerank2": 0.04721624022600212,
+        "prefix_score": 0,
+        "attack": "",
+        "found": true,
+        "threat_type": ""
+    }
+}]]

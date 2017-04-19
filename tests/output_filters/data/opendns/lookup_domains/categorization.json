@@ -1,0 +1,20 @@
+{
+    "bango.com": {
+        "status": 1,
+        "content_categories": [
+            "Search Engines",
+            "Business Services",
+            "Research/Reference"
+        ],
+        "security_categories": []
+    },
+    "dango.com": {
+        "status": 0,
+        "content_categories": [
+            "Phishing"
+        ],
+        "security_categories": []
+    },
+    "dingo.com": null,
+    "bingo.com": null
+}

@@ -2,6 +2,7 @@
 #
 # LookupDomainsFilter uses OpenDNS to lookup the values in 'osxcollector_domains' and adds the 'osxcollector_opendns' key.
 #
+import logging
 from collections import namedtuple
 
 from threat_intel.opendns import InvestigateApi
@@ -92,25 +93,37 @@ class LookupDomainsFilter(ThreatFeedFilter):
 
         iocs = filter(lambda x: not self._whitelist.match_values(x), all_iocs)
 
-        categorized = investigate.categorization(iocs)
+        categorization = investigate.categorization(iocs)
 
         # Mark the categorization as suspicious
-        for domain in categorized.keys():
-            categorized[domain]['suspicious'] = self._is_category_info_suspicious(categorized[domain])
+        for domain, categorization_info in categorization.iteritems():
+            if categorization_info:
+                categorization_info['suspicious'] = \
+                    self._is_category_info_suspicious(categorization_info)
+            else:
+                logging.warn(
+                    'No categorization for domain {0}'.format(domain))
+                categorization[domain] = {'suspicious': False}
 
         # Decide which values to lookup security info for
-        iocs = filter(lambda domain: self._should_get_security_info(domain, categorized[domain]), categorized.keys())
+        iocs = filter(lambda domain: self._should_get_security_info(categorization[domain]), categorization)
 
         security = investigate.security(iocs)
 
-        for domain in security.keys():
-            security[domain]['suspicious'] = self._is_security_info_suspicious(security[domain])
+        for domain, security_info in security.iteritems():
+            if security_info:
+                security_info['suspicious'] = \
+                    self._is_security_info_suspicious(security_info)
+            else:
+                logging.warn(
+                    'No security information for domain {0}'.format(domain))
+                security[domain] = {'suspicious': False}
 
         for domain in security.keys():
-            if self._should_store_ioc_info(categorized[domain], security[domain]):
+            if self._should_store_ioc_info(categorization[domain], security[domain]):
                 threat_info[domain] = {
                     'domain': domain,
-                    'categorization': categorized[domain],
+                    'categorization': categorization[domain],
                     'security': self._trim_security_result(security[domain]),
                     'link': 'https://investigate.opendns.com/domain-view/name/{0}/view'.format(domain.encode('utf-8', errors='ignore'))
                 }
@@ -131,22 +144,21 @@ class LookupDomainsFilter(ThreatFeedFilter):
 
         return -1 == status or len(security_categories) or any([cat in self.SUSPICIOUS_CATEGORIES for cat in content_categories])
 
-    def _should_get_security_info(self, domain, category_info):
-        """Figure out whether the info on the domain is interesting enough to gather more data.
+    def _should_get_security_info(self, categorization_info):
+        """Figure out whether the categorization info on the domain is interesting enough to gather more data.
 
         If the domain isn't categorized, or is categorized as suspicious, get security info.
 
         Args:
-            domain: A string domain
-            category_info: A dict of info returned by the OpenDNS categorization call
+            categorization_info: A dict of info returned by the OpenDNS categorization call
         Returns:
             boolean
         """
-        status = category_info['status']
-        content_categories = category_info['content_categories']
-        security_categories = category_info['security_categories']
+        status = categorization_info.get('status', 0)
+        content_categories = categorization_info.get('content_categories', [])
+        security_categories = categorization_info.get('security_categories', [])
 
-        return self._is_category_info_suspicious(category_info) or \
+        return categorization_info['suspicious'] or \
             (0 == status and 0 == len(content_categories) and 0 == len(security_categories))
 
     def _is_security_info_suspicious(self, security_info):
