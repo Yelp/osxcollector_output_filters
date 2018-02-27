@@ -41,6 +41,7 @@ from osxcollector.output_filters.summary_filters.html import HtmlSummaryFilter
 from osxcollector.output_filters.summary_filters.text import TextSummaryFilter
 from osxcollector.output_filters.virustotal.lookup_domains import LookupDomainsFilter as VtLookupDomainsFilter
 from osxcollector.output_filters.virustotal.lookup_hashes import LookupHashesFilter as VtLookupHashesFilter
+from osxcollector.output_filters.alexa.lookup_rankings import LookupRankingsFilter as ArLookupRankingsFilter
 
 
 class AnalyzeFilter(ChainFilter):
@@ -51,7 +52,8 @@ class AnalyzeFilter(ChainFilter):
     effect the operations of the next filter.
     """
 
-    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False, readout=False, **kwargs):
+    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False,
+            no_alexaranking=False, readout=False, **kwargs):
 
         filter_chain = []
 
@@ -60,6 +62,10 @@ class AnalyzeFilter(ChainFilter):
             filter_chain.append(FirefoxExtensionsFilter(**kwargs))
 
             filter_chain.append(FindDomainsFilter(**kwargs))
+
+            # Do Alexa ranking lookups first since they are dependent only on FindDomainsFilter
+            if not no_alexaranking:
+                filter_chain.append(ArLookupRankingsFilter(**kwargs))
 
             # Do hash related lookups first. This is done first since hash lookup is not influenced
             # by anything but other hash lookups.
@@ -108,6 +114,8 @@ class AnalyzeFilter(ChainFilter):
                            help='[OPTIONAL] Don\'t run VirusTotal filters')
         group.add_argument('--no-shadowserver', dest='no_shadowserver', action='store_true', default=False,
                            help='[OPTIONAL] Don\'t run ShadowServer filters')
+        group.add_argument('--no-alexaranking', dest='no_alexaranking', action='store_true', default=False,
+                           help='[OPTIONAL] Don\'t run AlexaRanking filters')
         group.add_argument('-M', '--monochrome', dest='monochrome', action='store_true', default=False,
                            help='[OPTIONAL] Output monochrome analysis')
         group.add_argument('--show-signature-chain', dest='show_signature_chain', action='store_true', default=False,

@@ -29,6 +29,9 @@ class HtmlSummaryFilter(SummaryFilter):
         if 'osxcollector_vtdomain' in blob:
             self._vtdomain.append(blob)
 
+        if 'osxcollector_alexa_rank' in blob:
+            self._alexarank.append(blob)
+
         if 'osxcollector_opendns' in blob:
             self._opendns.append(blob)
 
@@ -233,6 +236,9 @@ class HtmlSummaryFilter(SummaryFilter):
             if 'osxcollector_vtdomain' in blob:
                 self._summarize_vtdomain(blob)
 
+            if 'osxcollector_alexa_rank' in blob:
+                self._summarize_alexa_rank(blob)
+
             if 'osxcollector_opendns' in blob:
                 self._summarize_opendns(blob)
 
@@ -287,6 +293,12 @@ class HtmlSummaryFilter(SummaryFilter):
             for key in ['domain', 'detections']:
                 val = blob.get(key)
                 self._summarize_val(key, val, 'vtdomain')
+
+    def _summarize_alexa_rank(self, blob):
+        for blob in blob['osxcollector_alexa_rank']:
+            for key in ['attributes']:
+                val = blob.get(key)
+                self._summarize_val(key, val, 'alexarank')
 
     def _summarize_opendns(self, blob):
         for blob in blob['osxcollector_opendns']:

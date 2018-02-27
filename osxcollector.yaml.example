@@ -55,3 +55,7 @@ virustotal:
     LookupURLsFilter:
         cache_file_name: "/tmp/cache.virustotal.LookupURLsFilter.json"
     resources_per_req: 4
+
+alexa:
+    LookupRankingsFilter:
+        cache_file_name: "/tmp/cache.alexa.LookupRankingsFilter.json"
