@@ -7,10 +7,7 @@ from threat_intel.alexa import AlexaRankingsApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.base_filters.threat_feed import ThreatFeedFilter
-from osxcollector.output_filters.util.blacklist import create_blacklist
 from osxcollector.output_filters.util.config import config_get_deep
-
-import xml.etree.ElementTree as ET
 
 
 class LookupRankingsFilter(ThreatFeedFilter):
@@ -18,8 +15,7 @@ class LookupRankingsFilter(ThreatFeedFilter):
     """A class to lookup traffic rankings using AWIS API."""
 
     def __init__(self, lookup_when=None, **kwargs):
-        super(LookupRankingsFilter, self).__init__('osxcollector_domains', 'osxcollector_alexa_rank',
-                                                  lookup_when=lookup_when, name_of_api_key=None, **kwargs)
+        super(LookupRankingsFilter, self).__init__('osxcollector_domains', 'osxcollector_alexa_rank', lookup_when=lookup_when, name_of_api_key=None, **kwargs)
 
     def _lookup_iocs(self, domains, resource_per_req=25):
         """Caches the Alexa ranking info for a set of domains.
@@ -45,7 +41,7 @@ class LookupRankingsFilter(ThreatFeedFilter):
                 traffic_info[domain] = report
 
         return traffic_info
-    
+
     def _should_store_ioc_info(self, report):
         """Only store if traffic ranking passes a certain threshold.
 
@@ -56,8 +52,10 @@ class LookupRankingsFilter(ThreatFeedFilter):
         """
         return True
 
+
 def main():
     run_filter_main(LookupRankingsFilter)
+
 
 if __name__ == "__main__":
     main()

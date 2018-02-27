@@ -52,8 +52,7 @@ class AnalyzeFilter(ChainFilter):
     effect the operations of the next filter.
     """
 
-    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False,
-            no_alexaranking=False, readout=False, **kwargs):
+    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False, no_alexaranking=False, readout=False, **kwargs):
 
         filter_chain = []
 
