@@ -52,7 +52,7 @@ class AnalyzeFilter(ChainFilter):
     effect the operations of the next filter.
     """
 
-    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False, no_alexaranking=False, readout=False, **kwargs):
+    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False, no_alexa=False, readout=False, **kwargs):
 
         filter_chain = []
 
@@ -63,7 +63,7 @@ class AnalyzeFilter(ChainFilter):
             filter_chain.append(FindDomainsFilter(**kwargs))
 
             # Do Alexa ranking lookups first since they are dependent only on FindDomainsFilter
-            if not no_alexaranking:
+            if not no_alexa:
                 filter_chain.append(ArLookupRankingsFilter(**kwargs))
 
             # Do hash related lookups first. This is done first since hash lookup is not influenced
@@ -113,7 +113,7 @@ class AnalyzeFilter(ChainFilter):
                            help='[OPTIONAL] Don\'t run VirusTotal filters')
         group.add_argument('--no-shadowserver', dest='no_shadowserver', action='store_true', default=False,
                            help='[OPTIONAL] Don\'t run ShadowServer filters')
-        group.add_argument('--no-alexaranking', dest='no_alexaranking', action='store_true', default=False,
+        group.add_argument('--no-alexa', dest='no_alexa', action='store_true', default=False,
                            help='[OPTIONAL] Don\'t run AlexaRanking filters')
         group.add_argument('-M', '--monochrome', dest='monochrome', action='store_true', default=False,
                            help='[OPTIONAL] Output monochrome analysis')
