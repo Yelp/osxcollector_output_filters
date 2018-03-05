@@ -52,6 +52,9 @@ class LookupRankingsFilter(ThreatFeedFilter):
         Returns:
             booleans
         """
+        # Always include Alexa ranking information since we do not yet
+        # categorize by it for the output summaries, rather just use it as an
+        # additional source of threat intel.
         return True
 
 
