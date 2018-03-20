@@ -4,7 +4,7 @@
 # AlexaRankingFilter uses the AWIS API to lookup Alexa traffic rankings.
 #
 
-from threat_intel.alexa import AlexaRankingsApi
+from threat_intel.alexaranking import AlexaRankingApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.base_filters.threat_feed import ThreatFeedFilter
@@ -33,7 +33,7 @@ class LookupRankingsFilter(ThreatFeedFilter):
         traffic_info = {}
 
         cache_file_name = config_get_deep('alexa.LookupRankingsFilter.cache_file_name', None)
-        ar = AlexaRankingsApi(resource_per_req, cache_file_name=cache_file_name)
+        ar = AlexaRankingApi(resource_per_req, cache_file_name=cache_file_name)
 
         iocs = domains
         reports = ar.get_alexa_rankings(iocs)
