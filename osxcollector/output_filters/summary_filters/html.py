@@ -175,7 +175,6 @@ class HtmlSummaryFilter(SummaryFilter):
         self._print_para('Hopefully that was helpful.')
         self._write('</div>')
 
-
     def summarize_by_threat_indicator(self):
 
         self._print_header('Table of contents', level=2)
