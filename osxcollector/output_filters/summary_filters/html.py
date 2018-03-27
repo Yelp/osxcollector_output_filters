@@ -154,13 +154,13 @@ class HtmlSummaryFilter(SummaryFilter):
             self._print_section_link('iocs', 'Remaining IOCs not tagged by key', len(self._iocs))
             self._write('</ul>')
 
-        for ioc_key, ioc_value in self._iocs_by_key.iteritems():
-            self._write('<div id="{0}">'.format(ioc_key))
-            self._print_header('{0}'.format(ioc_key), level=2)
-            self._print_para('Here is the analysis for the IOC {0}.'.format(ioc_key))
-            self._summarize_blobs(ioc_value)
-            self._print_para('Hopefully that was helpful.')
-            self._write('</div>')
+            for ioc_key, ioc_value in self._iocs_by_key.iteritems():
+                self._write('<div id="{0}">'.format(ioc_key))
+                self._print_header('{0}'.format(ioc_key), level=2)
+                self._print_para('Here is the analysis for the IOC {0}.'.format(ioc_key))
+                self._summarize_blobs(ioc_value)
+                self._print_para('Hopefully that was helpful.')
+                self._write('</div>')
 
         self._write('<div id="iocs">')
         if (self._group_key):
