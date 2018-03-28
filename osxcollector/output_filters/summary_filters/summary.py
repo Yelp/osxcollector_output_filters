@@ -2,16 +2,13 @@
 import sys
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
-from collections import defaultdict
 
 
 class SummaryFilter(OutputFilter):
     """Base class for summary filters."""
 
-    def __init__(self, show_signature_chain=False, show_browser_ext=False, summary_output_file=None, group_by_iocs=False, group_key=None, **kwargs):
+    def __init__(self, show_signature_chain=False, show_browser_ext=False, summary_output_file=None, **kwargs):
         super(SummaryFilter, self).__init__(**kwargs)
-        self._iocs = []
-        self._iocs_by_key = defaultdict(list)
         self._vthash = []
         self._vtdomain = []
         self._opendns = []
@@ -21,8 +18,6 @@ class SummaryFilter(OutputFilter):
         self._extensions = []
         self._show_signature_chain = show_signature_chain
         self._show_browser_ext = show_browser_ext
-        self._group_by_iocs = group_by_iocs
-        self._group_key = group_key
 
         self._add_to_blacklist = []
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 from numbers import Number
-import tldextract
 
 from osxcollector.output_filters.summary_filters.summary import SummaryFilter
 
@@ -24,48 +23,30 @@ class HtmlSummaryFilter(SummaryFilter):
         Returns:
             A dict or None
         """
-        isIOC = False
-
         if 'osxcollector_vthash' in blob:
             self._vthash.append(blob)
-            isIOC = True
 
         if 'osxcollector_vtdomain' in blob:
             self._vtdomain.append(blob)
-            isIOC = True
 
         if 'osxcollector_opendns' in blob:
             self._opendns.append(blob)
-            isIOC = True
 
         if 'osxcollector_blacklist' in blob:
             self._blacklist.append(blob)
-            isIOC = True
 
         if 'osxcollector_related' in blob:
             self._related.append(blob)
-            isIOC = True
 
         if self._show_signature_chain:
             if 'signature_chain' in blob and blob['osxcollector_section'] in ['startup', 'kext']:
                 signature_chain = blob['signature_chain']
                 if not len(signature_chain) or 'Apple Root CA' != signature_chain[-1]:
                     self._signature_chain.append(blob)
-                    isIOC = True
 
         if self._show_browser_ext:
             if blob['osxcollector_section'] in ['firefox', 'chrome'] and blob.get('osxcollector_subsection') == 'extensions':
                 self._extensions.append(blob)
-                isIOC = True
-
-        if isIOC:
-            if self._group_key in blob:
-                key = blob[self._group_key]
-                if (self._group_key == 'osxcollector_domains'):
-                    key = tldextract.extract(key[0]).domain + '.' + tldextract.extract(key[0]).suffix
-                self._iocs_by_key[key].append(blob)
-            else:
-                self._iocs.append(blob)
 
         return blob
 
@@ -98,10 +79,6 @@ class HtmlSummaryFilter(SummaryFilter):
                 font-weight: bold;
             }
 
-            h4 {
-                color: #3cb52e;
-            }
-
             p {
                 color: #ccccc8;
             }
@@ -121,61 +98,9 @@ class HtmlSummaryFilter(SummaryFilter):
             .val {
                 color: #00ff00;
             }
-
-            dl, dt {
-                margin-bottom: 10px;
-                margin-top: 10px;
-            }
-
         </style></head><body>''')
         self._print_header('Very Readable Output Bot')
         self._print_para('Let\'s see what\'s up with this machine.')
-
-        if (self._group_by_iocs):
-            self.summarize_by_ioc()
-        else:
-            self.summarize_by_threat_indicator()
-
-        self._print_para('Very Readable Output Bot')
-        self._print_para('#kaythanksbye')
-
-        self._write('</body></html>')
-
-        return []
-
-    def summarize_by_ioc(self):
-
-        if self._group_key:
-            self._print_header('Table of contents (sorted by {0})'.format(self._group_key), level=2)
-            self._write('<ul id="toc">')
-            for ioc_key, ioc_value in self._iocs_by_key.iteritems():
-                self._print_section_link(
-                    ioc_key, ioc_key, len(ioc_value))
-            self._print_section_link('iocs', 'Remaining IOCs not tagged by key', len(self._iocs))
-            self._write('</ul>')
-
-            for ioc_key, ioc_value in self._iocs_by_key.iteritems():
-                self._write('<div id="{0}">'.format(ioc_key))
-                self._print_header('{0}'.format(ioc_key), level=2)
-                self._print_para('Here is the analysis for the IOC {0}.'.format(ioc_key))
-                self._summarize_blobs(ioc_value)
-                self._print_para('Hopefully that was helpful.')
-                self._write('</div>')
-
-        self._write('<div id="iocs">')
-        if (self._group_key):
-            self._print_header('Remaining IOCs ({0})'.format(self._iocs), level=2)
-        else:
-            self._print_header('All IOCs ({0})'.format(len(self._iocs)), level=2)
-        if (self._group_key):
-            self._print_para('Here is a list of remaining IOCs that were not tagged by your key, just in case!')
-        else:
-            self._print_para('Get ready to analyze a bunch of IOCs!')
-        self._summarize_blobs(self._iocs)
-        self._print_para('Hopefully that was helpful.')
-        self._write('</div>')
-
-    def summarize_by_threat_indicator(self):
 
         self._print_header('Table of contents', level=2)
         self._write('<ul id="toc">')
@@ -282,6 +207,13 @@ class HtmlSummaryFilter(SummaryFilter):
             self._print_para('That might just help things, Skippy!')
             self._write('</div>')
 
+        self._print_para('Very Readable Output Bot')
+        self._print_para('#kaythanksbye')
+
+        self._write('</body></html>')
+
+        return []
+
     def _print_section_link(self, section, title, size):
         self._write('<li><a href="#{0}">{1}</a> ({2})</li>'.format(
             section, title, size))
@@ -290,11 +222,7 @@ class HtmlSummaryFilter(SummaryFilter):
         self._write('<ol class="blobs">')
         for blob in blobs:
             self._write('<li>')
-            section = blob.get('osxcollector_section')
-            subsection = blob.get('osxcollector_subsection', '')
-            self._print_header(u'{0} {1}'.format(section, subsection), level=3)
-            self._write('<dl class="list">')
-            self._summarize_general(blob)
+            self._summarize_line(blob)
 
             add_to_blacklist = False
 
@@ -309,10 +237,12 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._summarize_opendns(blob)
 
             if 'osxcollector_blacklist' in blob:
-                self._summarize_blacklist(blob)
+                for key in blob['osxcollector_blacklist'].keys():
+                    self._summarize_val(u'blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
 
             if 'osxcollector_related' in blob:
-                self._summarize_related(blob)
+                for key in blob['osxcollector_related'].keys():
+                    self._summarize_val(u'related-{0}'.format(key), blob['osxcollector_related'][key])
 
             if 'md5' in blob and '' == blob['md5']:
                 add_to_blacklist = True
@@ -329,57 +259,48 @@ class HtmlSummaryFilter(SummaryFilter):
                 for domain in blob.get('osxcollector_domains', []):
                     if domain not in values_on_blacklist:
                         self._add_to_blacklist.append(('domain', domain))
-            self._write('</dl>')  # this is the end of the list started by "_summarize_line"
+            self._write('</ul>')  # this is the end of the list started by "_summarize_line"
             self._write('</li>')
         self._write('</ol>')
 
-    def _summarize_general(self, blob):
-        self._write(u'<dt>General</dt>')
+    def _summarize_line(self, blob):
+        section = blob.get('osxcollector_section')
+        subsection = blob.get('osxcollector_subsection', '')
+
+        self._print_header(u'{0} {1}'.format(section, subsection), level=3)
+        self._write('<ul class="list">')
         for key in sorted(blob.keys()):
             if not key.startswith('osxcollector') and blob.get(key):
                 val = blob.get(key)
-                self._summarize_val(key, val, etype='dd')
+                self._summarize_val(key, val)
 
     def _summarize_vthash(self, blob):
-        self._write(u'<dt>Virustotal Hash</dt>')
         for blob in blob['osxcollector_vthash']:
             for key in ['positives', 'total', 'scan_date']:
                 val = blob.get(key)
-                self._summarize_val(key, val, 'vthash', etype='dd')
+                self._summarize_val(key, val, 'vthash')
             permalink = blob.get('permalink')
             self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(permalink))
 
     def _summarize_vtdomain(self, blob):
-        self._write(u'<dt>Virustotal Domain</dt>')
         for blob in blob['osxcollector_vtdomain']:
             for key in ['domain', 'detections']:
                 val = blob.get(key)
-                self._summarize_val(key, val, 'vtdomain', etype='dd')
+                self._summarize_val(key, val, 'vtdomain')
 
     def _summarize_opendns(self, blob):
-        self._write(u'<dt>OpenDNS</dt>')
         for blob in blob['osxcollector_opendns']:
             for key in ['domain', 'categorization', 'security']:
                 val = blob.get(key)
-                self._summarize_val(key, val, 'opendns', etype='dd')
+                self._summarize_val(key, val, 'opendns')
             link = blob.get('link')
-            self._write(u'<dd><a href="{0}" target="_blank">{0}</a></dd>'.format(link))
+            self._write(u'<li><a href="{0}" target="_blank">{0}</a></li>'.format(link))
 
-    def _summarize_blacklist(self, blob):
-        self._write(u'<dt>Blacklist</dt>')
-        for key in blob['osxcollector_blacklist'].keys():
-            self._summarize_val(u'blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
-
-    def _summarize_related(self, blob):
-        self._write(u'<dt>Related</dt>')
-        for key in blob['osxcollector_related'].keys():
-            self._summarize_val(u'related-{0}'.format(key), blob['osxcollector_related'][key])
-
-    def _summarize_val(self, key, val, prefix=None, etype='li'):
-        self._write('<{0}>'.format(etype))
+    def _summarize_val(self, key, val, prefix=None):
+        self._write('<li>')
         self._print_key(key, prefix)
         self._print_val(val)
-        self._write('</{0}>'.format(etype))
+        self._write('</li>')
 
     def _print_header(self, text, level=1):
         self._write(u'<h{0}>{1}</h{0}>'.format(level, text))
