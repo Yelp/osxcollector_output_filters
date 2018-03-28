@@ -119,7 +119,7 @@ class AnalyzeFilter(ChainFilter):
         group.add_argument('-w', '--html', dest='html_output_file', default=None,
                            help='[OPTIONAL] Path to the output file where summary in HTML format will be written to.')
         group.add_argument('-c', '--group-by-iocs', dest='group_by_iocs', action='store_true', default=False,
-                           help='[OPTIONAL] Summarize the output grouped by IOCs instead of by threat indicators.')
+                           help='[OPTIONAL] Summarize the output grouped by IOCs instead of threat indicators.')
         group.add_argument('-k', '--group-key', dest='group_key', default=None,
                            help='[OPTIONAL] If sorting by IOCs, select which key to group by (sha1/sha2/domain)')
         return parser
