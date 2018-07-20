@@ -91,7 +91,7 @@ class Blacklist(object):
                 domain = clean_domain(blacklisted_value)
             except BadDomainError:
                 logging.warning(
-                    u'Blacklisted value "{0}" cannot be resolved as a domain name'
+                    'Blacklisted value "{0}" cannot be resolved as a domain name'
                     .format(blacklisted_value))
                 return None
 
