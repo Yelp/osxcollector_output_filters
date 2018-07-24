@@ -158,3 +158,25 @@ class CreateBlacklistTest(T.TestCase):
             T.assert_equal(bool(blacklist.match_line(blob)), True)
         for blob in bad_blobs:
             T.assert_equal(bool(blacklist.match_line(blob)), False)
+
+    def test_log_unicode_domain(self):
+        config_chunk = {
+            'blacklist_name': 'Unicode domain',
+            'blacklist_keys': ['visited_domain'],
+            'blacklist_file_path': 'not_really_a_blacklist.txt',
+            'blacklist_is_domains': True
+        }
+        file_contents = ['Bücher.tld']
+        with \
+                patch.object(Blacklist, '_read_blacklist_file_contents', return_value=file_contents), \
+                patch('logging.warning', autospec=True) as patched_logging_warning:
+            blacklist = create_blacklist(config_chunk)
+
+        T.assert_equal(1, patched_logging_warning.call_count)
+        calls = [
+            call('Blacklisted value "Bücher.tld" cannot be resolved as a domain name'),
+        ]
+        T.assert_equal(calls, patched_logging_warning.call_args_list)
+
+        blob = {'visted_domain': 'Bücher.tld'}
+        T.assert_equal(bool(blacklist.match_line(blob)), False)
