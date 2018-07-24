@@ -15,6 +15,7 @@ class SummaryFilter(OutputFilter):
         self._vthash = []
         self._vtdomain = []
         self._opendns = []
+        self._alexarank = []
         self._blacklist = []
         self._related = []
         self._signature_chain = []
