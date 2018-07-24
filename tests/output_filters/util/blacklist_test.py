@@ -159,6 +159,7 @@ class CreateBlacklistTest(T.TestCase):
         for blob in bad_blobs:
             T.assert_equal(bool(blacklist.match_line(blob)), False)
 
+    # TODO: Refactor OSXCollector Output Filters to work with unicode-based domains
     def test_log_unicode_domain(self):
         config_chunk = {
             'blacklist_name': 'Unicode domain',
@@ -166,15 +167,16 @@ class CreateBlacklistTest(T.TestCase):
             'blacklist_file_path': 'not_really_a_blacklist.txt',
             'blacklist_is_domains': True
         }
-        file_contents = ['Bücher.tld']
+        file_contents = ['Bücher.tld', 'yelp.公司', 'www.Yülp.tld','иelф.р']
         with \
                 patch.object(Blacklist, '_read_blacklist_file_contents', return_value=file_contents), \
                 patch('logging.warning', autospec=True) as patched_logging_warning:
             blacklist = create_blacklist(config_chunk)
 
-        T.assert_equal(1, patched_logging_warning.call_count)
+        T.assert_equal(4, patched_logging_warning.call_count)
         calls = [
-            call('Blacklisted value "Bücher.tld" cannot be resolved as a domain name'),
+            call(u'Blacklisted value "{0}" cannot be resolved as a domain name'\
+                    .format(domain.decode('utf8'))) for domain in file_contents
         ]
         T.assert_equal(calls, patched_logging_warning.call_args_list)
 
