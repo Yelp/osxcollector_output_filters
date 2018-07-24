@@ -72,6 +72,25 @@ class CreateBlacklistTest(T.TestCase):
         T.assert_equal(blacklist._is_regex, True)
         T.assert_equal(blacklist._is_domains, True)
 
+    # TODO: Refactor OSXCollector Output Filters to work with unicode-based domains
+    def test_bad_domains_unicode(self):
+        unicode_domain_1 = 'yelp.公司'
+        unicode_domain_2 = 'www.Yülp.tld'
+        unicode_domain_3 = 'иelф.р'
+        unicode_domains = [unicode_domain_1, unicode_domain_2, unicode_domain_3]
+        self._blacklist_data['blacklist_is_domains'] = True
+        with patch.object(Blacklist, '_read_blacklist_file_contents',
+                return_value=unicode_domains) as self._file_contents:
+            with patch('logging.warning', autospec=True) as patched_logging_warning:
+                blacklist = create_blacklist(self._blacklist_data)
+
+        T.assert_equal(3, patched_logging_warning.call_count)
+        calls = [
+            call(u'Blacklisted value "{0}" cannot be resolved as a domain name'\
+                    .format(unicode_domain.decode('utf8'))) for unicode_domain in unicode_domains
+        ]
+        T.assert_equal(calls, patched_logging_warning.call_args_list)
+
     def test_bad_domains(self):
         self._blacklist_data['blacklist_is_domains'] = True
         with patch('logging.warning', autospec=True) as patched_logging_warning:

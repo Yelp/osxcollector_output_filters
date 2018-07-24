@@ -90,6 +90,8 @@ class Blacklist(object):
             try:
                 domain = clean_domain(blacklisted_value)
             except BadDomainError:
+                if not isinstance(blacklisted_value, unicode):
+                    blacklisted_value = blacklisted_value.decode('utf8')
                 logging.warning(
                     u'Blacklisted value "{0}" cannot be resolved as a domain name'
                     .format(blacklisted_value))
