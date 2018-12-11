@@ -16,3 +16,10 @@
     sha: f5c67b716c04babb6e8e80bb52e329ee7654b1b8
     hooks:
     -   id: reorder-python-imports
+-   repo: https://github.com/Yelp/detect-secrets
+    sha: 0.9.1
+    hooks:
+    -   id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: .*tests/.*|\.pre-commit-config\.yaml
+        language_version: python2.7
