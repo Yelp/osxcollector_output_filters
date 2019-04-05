@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
+from collections import defaultdict
+
+import six
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
-from collections import defaultdict
 
 
 class SummaryFilter(OutputFilter):
@@ -33,7 +38,7 @@ class SummaryFilter(OutputFilter):
 
     def _open_output_stream(self, summary_output_file):
         if summary_output_file:
-            if isinstance(summary_output_file, basestring):
+            if isinstance(summary_output_file, six.string_types):
                 self._output_stream = open(summary_output_file, 'w')
                 self._close_file = True
             else:

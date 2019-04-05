@@ -1,3 +1,4 @@
 simplejson==3.10.0
-threat_intel==0.1.27
+six==1.12.0
+threat_intel==0.1.29
 tldextract==2.0.2

@@ -3,6 +3,9 @@
 #
 # LookupHashesFilter uses VirusTotal to lookup the values in 'sha2' and add 'osxcollector_vthash' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from threat_intel.virustotal import VirusTotalApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -15,9 +18,11 @@ class LookupHashesFilter(ThreatFeedFilter):
     """A class to lookup hashes using VirusTotal API."""
 
     def __init__(self, lookup_when=None, **kwargs):
-        super(LookupHashesFilter, self).__init__('sha2',
-                                                 'osxcollector_vthash', lookup_when=lookup_when,
-                                                 name_of_api_key='virustotal', **kwargs)
+        super(LookupHashesFilter, self).__init__(
+            'sha2',
+            'osxcollector_vthash', lookup_when=lookup_when,
+            name_of_api_key='virustotal', **kwargs
+        )
 
     def _lookup_iocs(self, all_iocs, resource_per_req=25):
         """Caches the VirusTotal info for a set of hashes.
@@ -33,7 +38,7 @@ class LookupHashesFilter(ThreatFeedFilter):
         vt = VirusTotalApi(self._api_key, resource_per_req, cache_file_name=cache_file_name)
         reports = vt.get_file_reports(all_iocs)
 
-        for hash_val in reports.keys():
+        for hash_val in reports:
             report = reports[hash_val]
             if not report:
                 continue
@@ -70,7 +75,7 @@ class LookupHashesFilter(ThreatFeedFilter):
             'permalink',
             'positives',
             'total',
-            'response_code'
+            'response_code',
         ]
 
         return dict([(key, report.get(key)) for key in copy_keys])
@@ -80,5 +85,5 @@ def main():
     run_filter_main(LookupHashesFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

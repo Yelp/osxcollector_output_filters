@@ -2,6 +2,9 @@
 #
 # ChainFilter is a base class that passes each line through a chain of OutputFilters.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from argparse import ArgumentParser
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter

@@ -2,9 +2,13 @@
 #
 # LookupDomainsFilter uses OpenDNS to lookup the values in 'osxcollector_domains' and adds the 'osxcollector_opendns' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import logging
 from collections import namedtuple
 
+import six
 from threat_intel.opendns import InvestigateApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -26,7 +30,7 @@ class LookupDomainsFilter(ThreatFeedFilter):
         'Mobile Threats',
         'High Risk Sites and Locations',
         'Malware',
-        'Phishing'
+        'Phishing',
     ]
 
     SecurityCheck = namedtuple('SecurityCheck', ['key', 'min', 'max', 'threshold'])
@@ -55,7 +59,7 @@ class LookupDomainsFilter(ThreatFeedFilter):
 
         # RIP ranks domains given their IP addresses and the reputation score of these IP addresses.
         # Ranges from -100 to 0, -100 being very suspicious
-        SecurityCheck('rip_score', -100, 0, -25)
+        SecurityCheck('rip_score', -100, 0, -25),
     ]
 
     SECURITY_BAD_KEYS = [
@@ -65,12 +69,14 @@ class LookupDomainsFilter(ThreatFeedFilter):
 
         # The type of the known attack, such as botnet or APT.
         # Returns blank if no known threat associated with domain.
-        'threat_type'
+        'threat_type',
     ]
 
     def __init__(self, lookup_when=None, **kwargs):
-        super(LookupDomainsFilter, self).__init__('osxcollector_domains', 'osxcollector_opendns',
-                                                  lookup_when=lookup_when, name_of_api_key='opendns', **kwargs)
+        super(LookupDomainsFilter, self).__init__(
+            'osxcollector_domains', 'osxcollector_opendns',
+            lookup_when=lookup_when, name_of_api_key='opendns', **kwargs
+        )
         self._whitelist = create_blacklist(config_get_deep('domain_whitelist'))
 
     def _lookup_iocs(self, all_iocs):
@@ -91,41 +97,45 @@ class LookupDomainsFilter(ThreatFeedFilter):
         cache_file_name = config_get_deep('opendns.LookupDomainsFilter.cache_file_name', None)
         investigate = InvestigateApi(self._api_key, cache_file_name=cache_file_name)
 
-        iocs = filter(lambda x: not self._whitelist.match_values(x), all_iocs)
+        iocs = [x for x in all_iocs if not self._whitelist.match_values(x)]
 
         categorization = investigate.categorization(iocs)
 
         # Mark the categorization as suspicious
-        for domain, categorization_info in categorization.iteritems():
+        for domain, categorization_info in six.iteritems(categorization):
             if categorization_info:
                 categorization_info['suspicious'] = \
                     self._is_category_info_suspicious(categorization_info)
             else:
-                logging.warn(
-                    'No categorization for domain {0}'.format(domain))
+                logging.warning(
+                    'No categorization for domain {0}'.format(domain),
+                )
                 categorization[domain] = {'suspicious': False}
 
         # Decide which values to lookup security info for
-        iocs = filter(lambda domain: self._should_get_security_info(categorization[domain]), categorization)
+        iocs = [domain for domain in categorization if self._should_get_security_info(categorization[domain])]
 
         security = investigate.security(iocs)
 
-        for domain, security_info in security.iteritems():
+        for domain, security_info in six.iteritems(security):
             if security_info:
                 security_info['suspicious'] = \
                     self._is_security_info_suspicious(security_info)
             else:
-                logging.warn(
-                    'No security information for domain {0}'.format(domain))
+                logging.warning(
+                    'No security information for domain {0}'.format(domain),
+                )
                 security[domain] = {'suspicious': False}
 
-        for domain in security.keys():
+        for domain in security:
             if self._should_store_ioc_info(categorization[domain], security[domain]):
                 threat_info[domain] = {
                     'domain': domain,
                     'categorization': categorization[domain],
                     'security': self._trim_security_result(security[domain]),
-                    'link': 'https://investigate.opendns.com/domain-view/name/{0}/view'.format(domain.encode('utf-8', errors='ignore'))
+                    'link': 'https://investigate.opendns.com/domain-view/name/{0}/view'.format(
+                        domain.encode('utf-8', errors='ignore') if six.PY2 else domain,
+                    ),
                 }
 
         return threat_info
@@ -227,5 +237,5 @@ def main():
     run_filter_main(LookupDomainsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

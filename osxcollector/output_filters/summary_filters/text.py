@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
 from numbers import Number
+
+import six
 
 from osxcollector.output_filters.summary_filters.summary import SummaryFilter
 
@@ -61,7 +66,7 @@ class TextSummaryFilter(SummaryFilter):
         if not self._monochrome:
             self._output_stream.write(color)
         try:
-            self._output_stream.write(msg.encode("utf-8", errors="ignore"))
+            self._output_stream.write(msg.encode('utf-8', errors='ignore'))
         except UnicodeDecodeError as err:
             self._output_stream.write(msg)
             sys.stderr.write('Unicode decode error: {0}'.format(err))
@@ -143,11 +148,11 @@ class TextSummaryFilter(SummaryFilter):
                 self._summarize_opendns(blob)
 
             if 'osxcollector_blacklist' in blob:
-                for key in blob['osxcollector_blacklist'].keys():
+                for key in blob['osxcollector_blacklist']:
                     self._summarize_val('blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
 
             if 'osxcollector_related' in blob:
-                for key in blob['osxcollector_related'].keys():
+                for key in blob['osxcollector_related']:
                     self._summarize_val('related-{0}'.format(key), blob['osxcollector_related'][key])
 
             if 'md5' in blob and '' == blob['md5']:
@@ -218,16 +223,15 @@ class TextSummaryFilter(SummaryFilter):
             self._write(']')
         elif isinstance(val, dict):
             self._write('{')
-            keys = val.keys()
-            for index, key in enumerate(keys):
+            for index, key in enumerate(val):
                 self._write('"')
                 self._write(key, self.VAL_COLOR)
                 self._write('": ')
                 self._print_val(val[key])
-                if index != len(keys) - 1:
+                if index != len(val) - 1:
                     self._write(', ')
             self._write('}')
-        elif isinstance(val, basestring):
+        elif isinstance(val, six.string_types):
             val = val[:480]
             self._write('"')
             self._write(val, self.VAL_COLOR)

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
 from numbers import Number
+
+import six
 import tldextract
 
 from osxcollector.output_filters.summary_filters.summary import SummaryFilter
@@ -19,7 +24,7 @@ class HtmlSummaryFilter(SummaryFilter):
         The OutputFilter can also choose to return nothing, effectively swallowing the line.
 
         Args:
-            output_line: A dict
+            blob: A dict
 
         Returns:
             A dict or None
@@ -64,7 +69,7 @@ class HtmlSummaryFilter(SummaryFilter):
         if isIOC:
             if self._group_key in blob:
                 key = blob[self._group_key]
-                if (self._group_key == 'osxcollector_domains'):
+                if self._group_key == 'osxcollector_domains':
                     key = tldextract.extract(key[0]).domain + '.' + tldextract.extract(key[0]).suffix
                 self._iocs_by_key[key].append(blob)
             else:
@@ -79,7 +84,8 @@ class HtmlSummaryFilter(SummaryFilter):
             self._output_stream.write(text)
             sys.stderr.write(
                 'Unicode decode error when encoding text:\n{0}\nError:\n{1}\n'
-                .format(text, err))
+                .format(text, err),
+            )
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.
@@ -134,7 +140,7 @@ class HtmlSummaryFilter(SummaryFilter):
         self._print_header('Very Readable Output Bot')
         self._print_para('Let\'s see what\'s up with this machine.')
 
-        if (self._group_by_iocs):
+        if self._group_by_iocs:
             self.summarize_by_ioc()
         else:
             self.summarize_by_threat_indicator()
@@ -151,13 +157,14 @@ class HtmlSummaryFilter(SummaryFilter):
         if self._group_key:
             self._print_header('Table of contents (sorted by {0})'.format(self._group_key), level=2)
             self._write('<ul id="toc">')
-            for ioc_key, ioc_value in self._iocs_by_key.iteritems():
+            for ioc_key, ioc_value in six.iteritems(self._iocs_by_key):
                 self._print_section_link(
-                    ioc_key, ioc_key, len(ioc_value))
+                    ioc_key, ioc_key, len(ioc_value),
+                )
             self._print_section_link('iocs', 'Remaining IOCs not tagged by key', len(self._iocs))
             self._write('</ul>')
 
-            for ioc_key, ioc_value in self._iocs_by_key.iteritems():
+            for ioc_key, ioc_value in six.iteritems(self._iocs_by_key):
                 self._write('<div id="{0}">'.format(ioc_key))
                 self._print_header('{0}'.format(ioc_key), level=2)
                 self._print_para('Here is the analysis for the IOC {0}.'.format(ioc_key))
@@ -185,37 +192,45 @@ class HtmlSummaryFilter(SummaryFilter):
 
         if len(self._vthash):
             self._print_section_link(
-                "vthash", "VirusTotal bad hash hits", len(self._vthash))
+                'vthash', 'VirusTotal bad hash hits', len(self._vthash),
+            )
 
         if len(self._vtdomain):
             self._print_section_link(
-                "vtdomain", "VirusTotal bad domain hits", len(self._vtdomain))
+                'vtdomain', 'VirusTotal bad domain hits', len(self._vtdomain),
+            )
 
         if len(self._opendns):
             self._print_section_link(
-                "opendns", "OpenDNS Investigate hits", len(self._opendns))
+                'opendns', 'OpenDNS Investigate hits', len(self._opendns),
+            )
 
         if len(self._blacklist):
             self._print_section_link(
-                "blacklist", "Blacklist hits", len(self._blacklist))
+                'blacklist', 'Blacklist hits', len(self._blacklist),
+            )
 
         if len(self._related):
             self._print_section_link(
-                "related", "Related hits", len(self._related))
+                'related', 'Related hits', len(self._related),
+            )
 
         if len(self._signature_chain):
             self._print_section_link(
-                "signature_chain", "Signature chain",
-                len(self._signature_chain))
+                'signature_chain', 'Signature chain',
+                len(self._signature_chain),
+            )
 
         if len(self._extensions):
             self._print_section_link(
-                "extensions", "Extensions", len(self._extensions))
+                'extensions', 'Extensions', len(self._extensions),
+            )
 
         if len(self._add_to_blacklist):
             self._print_section_link(
-                "add_to_blacklist", "Blacklist update suggestions",
-                len(self._add_to_blacklist))
+                'add_to_blacklist', 'Blacklist update suggestions',
+                len(self._add_to_blacklist),
+            )
 
         self._write('</ul>')
 
@@ -286,8 +301,11 @@ class HtmlSummaryFilter(SummaryFilter):
             self._write('</div>')
 
     def _print_section_link(self, section, title, size):
-        self._write('<li><a href="#{0}">{1}</a> ({2})</li>'.format(
-            section, title, size))
+        self._write(
+            '<li><a href="#{0}">{1}</a> ({2})</li>'.format(
+                section, title, size,
+            ),
+        )
 
     def _summarize_blobs(self, blobs):
         self._write('<ol class="blobs">')
@@ -341,7 +359,7 @@ class HtmlSummaryFilter(SummaryFilter):
 
     def _summarize_general(self, blob):
         self._write(u'<dt>General</dt>')
-        for key in sorted(blob.keys()):
+        for key in sorted(blob):
             if not key.startswith('osxcollector') and blob.get(key):
                 val = blob.get(key)
                 self._summarize_val(key, val, etype='dd')
@@ -379,12 +397,12 @@ class HtmlSummaryFilter(SummaryFilter):
 
     def _summarize_blacklist(self, blob):
         self._write(u'<dt>Blacklist</dt>')
-        for key in blob['osxcollector_blacklist'].keys():
+        for key in blob['osxcollector_blacklist']:
             self._summarize_val(u'blacklist-{0}'.format(key), blob['osxcollector_blacklist'][key])
 
     def _summarize_related(self, blob):
         self._write(u'<dt>Related</dt>')
-        for key in blob['osxcollector_related'].keys():
+        for key in blob['osxcollector_related']:
             self._summarize_val(u'related-{0}'.format(key), blob['osxcollector_related'][key])
 
     def _summarize_val(self, key, val, prefix=None, etype='li'):
@@ -409,7 +427,6 @@ class HtmlSummaryFilter(SummaryFilter):
             prefix = ''
         else:
             prefix += '-'
-
         self._write(u'<span class="key">{0}{1}</span>: '.format(prefix, key))
 
     def _print_val(self, val):
@@ -420,18 +437,16 @@ class HtmlSummaryFilter(SummaryFilter):
             self._write('</ul>')
         elif isinstance(val, dict):
             self._write('<ul class="dict">')
-            keys = val.keys()
-            for key in keys:
+            for key in val:
                 self._summarize_val(key, val[key])
             self._write('</ul>')
         elif isinstance(val, Number):
             val = str(val)
             self._encode_val(val)
-        elif isinstance(val, basestring):
+        elif isinstance(val, six.string_types):
             self._encode_val(val)
 
     def _encode_val(self, val):
-        if not isinstance(val, unicode):
-            val = unicode(val, errors='replace')
-
+        if not isinstance(val, six.text_type):
+            val = six.text_type(val, errors='replace')
         self._write(u'<span class="val">{0}</span>'.format(val))

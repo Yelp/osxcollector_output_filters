@@ -10,7 +10,7 @@ To setup a virtualenv for the first time use:
 ```shell
 $ sudo pip install tox virtualenv
 $ make venv
-$ source virtualenv_run/bin/activate
+$ source virtualenv_run/bin/activate  # Not necessary if you use aactivator
 ```
 
 ## Filter Configuration

@@ -3,6 +3,9 @@
 #
 # RelatedFilesFilter finds files related to specific terms or file names.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os.path
 from argparse import ArgumentParser
 
@@ -68,8 +71,10 @@ class RelatedFilesFilter(OutputFilter):
     def get_argument_parser(self):
         parser = ArgumentParser()
         group = parser.add_argument_group('RelatedFilesFilter')
-        group.add_argument('-f', '--file-term', dest='file_terms', default=[], action='append',
-                           help='[OPTIONAL] Suspicious terms to use in pivoting through file names.  May be specified more than once.')
+        group.add_argument(
+            '-f', '--file-term', dest='file_terms', default=[], action='append',
+            help='[OPTIONAL] Suspicious terms to use in pivoting through file names.  May be specified more than once.',
+        )
         return parser
 
     @property
@@ -83,7 +88,7 @@ class RelatedFilesFilter(OutputFilter):
     # Keys to look in to find file paths
     FILE_NAME_KEYS = [
         'file_path',
-        'osxcollector_plist_path'
+        'osxcollector_plist_path',
     ]
 
     # Words that can never be terms
@@ -122,7 +127,7 @@ class RelatedFilesFilter(OutputFilter):
         'usr',
         'utilities',
         'versions',
-        'var'
+        'var',
     ]
 
 
@@ -130,5 +135,5 @@ def main():
     run_filter_main(RelatedFilesFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

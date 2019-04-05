@@ -3,6 +3,9 @@
 #
 # FindExtensionsFilter reads the Firefox JSON blobs and creates records about the extensions and plugins.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.util.dict_utils import DictUtils
@@ -36,7 +39,7 @@ class FindExtensionsFilter(OutputFilter):
                 'osxcollector_incident_id': blob['osxcollector_incident_id'],
                 'name': DictUtils.get_deep(addon, 'defaultLocale.name', addon.get('name')),
                 'description': DictUtils.get_deep(addon, 'defaultLocale.description', addon.get('description')),
-                'path': addon.get('id')
+                'path': addon.get('id'),
             }
             if blob.get('osxcollector_username'):
                 extension['osxcollector_username'] = blob['osxcollector_username']
@@ -53,5 +56,5 @@ def main():
     run_filter_main(FindExtensionsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

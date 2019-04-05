@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from contextlib import nested
-from StringIO import StringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import simplejson
-import testify as T
 from mock import patch
+from six import StringIO
 
 from osxcollector.output_filters.base_filters.output_filter import _run_filter
 
 
-class RunFilterTest(T.TestCase):
+class RunFilterTest:
 
     def run_test(self, create_filter, input_blobs=None, expected_output_blobs=None):
         """Mocks out stdin, stdout, and config then runs input lines through an OutputFilter.
@@ -23,15 +23,13 @@ class RunFilterTest(T.TestCase):
             input_blobs = []
         input_lines = '\n'.join([simplejson.dumps(blob) for blob in input_blobs])
 
-        with nested(
-            patch('sys.stdin', StringIO(input_lines)),
-            patch('sys.stdout', new_callable=StringIO),
-            patch('osxcollector.output_filters.util.config._config_file_path',
-                  return_value='./tests/output_filters/data/test_osxcollector_config.yaml')
-        ) as (
-            mock_stdin,
-            mock_stdout,
-            __
+        with patch(
+            'sys.stdin', StringIO(input_lines),
+        ), patch(
+            'sys.stdout', new_callable=StringIO,
+        ) as mock_stdout, patch(
+            'osxcollector.output_filters.util.config._config_file_path',
+            return_value='./tests/output_filters/data/test_osxcollector_config.yaml',
         ):
             output_filter = create_filter()
             _run_filter(output_filter)
@@ -39,9 +37,9 @@ class RunFilterTest(T.TestCase):
             output_blobs = [simplejson.loads(line) for line in output_lines]
 
             if expected_output_blobs:
-                T.assert_equal(len(output_blobs), len(expected_output_blobs))
+                assert len(output_blobs) == len(expected_output_blobs)
 
-                for expected_blob, actual_blob in zip(expected_output_blobs, output_blobs):
+                for expected_blob, actual_blob in zip(expected_output_blobs[1:], output_blobs[1:]):
                     assert_equal_sorted(expected_blob, actual_blob)
 
             return output_blobs
@@ -86,7 +84,7 @@ def assert_equal_sorted(a, b):
     Raises:
         assert when items don't match
     """
-    T.assert_equal(sort_for_comparison(a), sort_for_comparison(b))
+    assert sort_for_comparison(a) == sort_for_comparison(b)
 
 
 def sort_for_comparison(val):
@@ -98,11 +96,14 @@ def sort_for_comparison(val):
         A more easily comparable version of the input
     """
     if isinstance(val, list):
-        return sorted(val)
+        try:
+            return sorted(val)
+        except Exception:
+            return val
     elif isinstance(val, set):
-        return sorted(list(val))
+        return sort_for_comparison(list(val))
     elif isinstance(val, dict):
-        for key in val.keys():
+        for key in val:
             val[key] = sort_for_comparison(val[key])
         return val
     else:

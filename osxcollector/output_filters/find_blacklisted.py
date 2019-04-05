@@ -3,6 +3,9 @@
 #
 # FindBlacklistedFilter adds 'osxcollector_blacklist' key to lines matching a blacklist.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.util.blacklist import create_blacklist
@@ -52,5 +55,5 @@ def main():
     run_filter_main(FindBlacklistedFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

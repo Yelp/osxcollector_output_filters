@@ -3,6 +3,9 @@
 #
 # LookupHashesFilter uses ShadowServer to lookup the values in 'sha1' and add 'osxcollector_shadowserver' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os.path
 
 from threat_intel.shadowserver import ShadowServerApi
@@ -48,5 +51,5 @@ def main():
     run_filter_main(LookupHashesFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
