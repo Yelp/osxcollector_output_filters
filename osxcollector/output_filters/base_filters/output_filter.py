@@ -5,10 +5,14 @@
 # _run_filter is a default implementation of a main that reads input from stdin, feeds it to an OutputFilter, and
 # spits the output to stdout.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
 from argparse import ArgumentParser
 
 import simplejson
+import six
 
 from osxcollector.output_filters.util.error_messages import write_exception
 
@@ -82,7 +86,9 @@ def _unbuffered_input(read_from):
     """
     line = read_from.readline()
     while bool(line):
-        yield line.decode('latin-1', errors='ignore').encode('utf-8', errors='ignore')
+        if isinstance(line, six.binary_type):
+            line = line.decode('latin-1', errors='ignore')
+        yield line.encode('utf-8', errors='ignore') if six.PY2 else line
         line = read_from.readline()
 
 
@@ -129,10 +135,15 @@ def run_filter_main(output_filter_cls):
     argument_parents = [filter_arguments] if filter_arguments else []
 
     parser = ArgumentParser(parents=argument_parents, conflict_handler='resolve')
-    parser.add_argument('-i', '--input-file', dest='input_file', default=None,
-                        help='[OPTIONAL] Path to OSXCollector output to read. Defaults to stdin otherwise.')
-    parser.add_argument('-o', '--output-file', dest='output_file', default=None,
-                        help='[OPTIONAL] Path where OSXCollector output augmented with the analysis results will be written to. Defaults to stdout otherwise.')
+    parser.add_argument(
+        '-i', '--input-file', dest='input_file', default=None,
+        help='[OPTIONAL] Path to OSXCollector output to read. Defaults to stdin otherwise.',
+    )
+    parser.add_argument(
+        '-o', '--output-file', dest='output_file', default=None,
+        help='[OPTIONAL] Path where OSXCollector output augmented with the analysis results will be written to. '
+             'Defaults to stdout otherwise.',
+    )
     args = parser.parse_args()
 
     output_filter = output_filter_cls(**vars(args))

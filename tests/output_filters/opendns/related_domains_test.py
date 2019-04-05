@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-import testify as T
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from osxcollector.output_filters.opendns.related_domains import RelatedDomainsFilter
 from tests.output_filters.run_filter_test import RunFilterTest
 
 
-class RelatedDomainsFilterTest(RunFilterTest):
+class TestRelatedDomainsFilter(RunFilterTest):
 
-    @T.setup
-    def setupDomainsAndIPs(self):
+    def setup_method(self, method):
         self._initial_domains = ['zendesk.com', 'jpmorganaccess.com', 'opendns.zendesk.com', 'yelp.com']
         self._initial_ips = ['159.53.60.177']
 
@@ -20,7 +20,7 @@ class RelatedDomainsFilterTest(RunFilterTest):
 
     def test_no_domains(self):
         input_blobs = [
-            {'tater': 'tots'}
+            {'tater': 'tots'},
         ]
         expected_relateddomains = None
         self._run_test(input_blobs, expected_relateddomains)
@@ -28,68 +28,68 @@ class RelatedDomainsFilterTest(RunFilterTest):
     def test_direct_domain_match(self):
         # Direct meaning the domain in the input is an initial domain
         input_blobs = [
-            {'osxcollector_domains': ['opendns.zendesk.com']}
+            {'osxcollector_domains': ['opendns.zendesk.com']},
         ]
         expected_relateddomains = [
             {
-                'domains': {'opendns.zendesk.com': ['opendns.zendesk.com']}
-            }
+                'domains': {'opendns.zendesk.com': ['opendns.zendesk.com']},
+            },
         ]
         self._run_test(input_blobs, expected_relateddomains)
 
     def test_related_domain_match(self):
         input_blobs = [
-            {'osxcollector_domains': ['webmd.com']}
+            {'osxcollector_domains': ['webmd.com']},
         ]
         expected_relateddomains = [
             {
-                'domains': {'webmd.com': ['opendns.zendesk.com', 'zendesk.com']}
-            }
+                'domains': {'webmd.com': ['opendns.zendesk.com', 'zendesk.com']},
+            },
         ]
         self._run_test(input_blobs, expected_relateddomains)
 
     def test_multiple_related_domain_match(self):
         input_blobs = [
-            {'osxcollector_domains': ['webmd.com', 'hushmail.zendesk.com']}
+            {'osxcollector_domains': ['webmd.com', 'hushmail.zendesk.com']},
         ]
         expected_relateddomains = [
             {
                 'domains':
                 {
                     'webmd.com': ['opendns.zendesk.com', 'zendesk.com'],
-                    'hushmail.zendesk.com': ['opendns.zendesk.com']
-                }
-            }
+                    'hushmail.zendesk.com': ['opendns.zendesk.com'],
+                },
+            },
         ]
         self._run_test(input_blobs, expected_relateddomains)
 
     def test_direct_and_related_domain_match(self):
         input_blobs = [
-            {'osxcollector_domains': ['zendesk.com']}
+            {'osxcollector_domains': ['zendesk.com']},
         ]
         expected_relateddomains = [
             {
-                'domains': {'zendesk.com': ['opendns.zendesk.com', 'zendesk.com']}
-            }
+                'domains': {'zendesk.com': ['opendns.zendesk.com', 'zendesk.com']},
+            },
         ]
         self._run_test(input_blobs, expected_relateddomains)
 
     def test_direct_ip_match(self):
         input_blobs = [
-            {'osxcollector_domains': ['jpmorganaccess.com']}
+            {'osxcollector_domains': ['jpmorganaccess.com']},
         ]
         expected_relateddomains = [
             {
-                'domains': {'jpmorganaccess.com': ['159.53.60.177', 'jpmorganaccess.com', 'opendns.zendesk.com', 'zendesk.com']}
-            }
+                'domains': {'jpmorganaccess.com': ['159.53.60.177', 'jpmorganaccess.com', 'opendns.zendesk.com', 'zendesk.com']},
+            },
         ]
         self._run_test(input_blobs, expected_relateddomains)
 
     def test_whitelist_domain(self):
         input_blobs = [
-            {'osxcollector_domains': ['yelp.com']}
+            {'osxcollector_domains': ['yelp.com']},
         ]
         expected_relateddomains = [
-            None
+            None,
         ]
         self._run_test(input_blobs, expected_relateddomains)

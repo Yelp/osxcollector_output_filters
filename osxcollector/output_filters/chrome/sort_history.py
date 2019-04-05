@@ -3,6 +3,11 @@
 #
 # SortHistoryFilter creates a clean sorted Chrome browser history and tags lines with {'osxcollector_browser_history': 'chrome'}
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import six
+
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 
@@ -42,24 +47,24 @@ class SortHistoryFilter(OutputFilter):
         """Join the 'visits' and 'urls' tables into a single browser history and timeline."""
         history = list()
 
-        for visit in self._visits_table.itervalues():
+        for visit in six.itervalues(self._visits_table):
             url = self._urls_table.get(visit.get('url'))
             if url:
                 record = {
-                    'url': url['url'].encode('utf-8'),
-                    'title': url['title'].encode('utf-8'),
+                    'url': url['url'].encode('utf-8') if six.PY2 else url['url'],
+                    'title': url['title'].encode('utf-8') if six.PY2 else url['url'],
                     'last_visit_time': url['last_visit_time'],
                     'visit_time': visit['visit_time'],
                     'core_transition': self.PAGE_TRANSITION.get_core_transition(visit['transition']),
                     'page_transition': self.PAGE_TRANSITION.get_qualifier_transitions(visit['transition']),
-                    'osxcollector_browser_history': 'chrome'
+                    'osxcollector_browser_history': 'chrome',
                 }
 
                 # Add all the OSXCollector specific keys to the record
-                for key in visit.keys():
+                for key in visit:
                     if key.startswith('osxcollector_'):
                         record[key] = visit[key]
-                for key in url.keys():
+                for key in url:
                     if key.startswith('osxcollector_') and key not in record:
                         record[key] = url[key]
 
@@ -278,5 +283,5 @@ def main():
     run_filter_main(SortHistoryFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

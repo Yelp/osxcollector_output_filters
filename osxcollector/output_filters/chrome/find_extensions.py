@@ -3,6 +3,9 @@
 #
 # FindExtensionsFilter reads the Chrome preferences JSON blob and creates records about the extensions and plugins.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.util.dict_utils import DictUtils
@@ -26,7 +29,7 @@ class FindExtensionsFilter(OutputFilter):
             return blob
 
         extensions_blob = DictUtils.get_deep(blob, 'contents.extensions.settings', {})
-        for key in extensions_blob.keys():
+        for key in extensions_blob:
             setting = extensions_blob[key]
             extension = {
                 'osxcollector_section': 'chrome',
@@ -36,7 +39,7 @@ class FindExtensionsFilter(OutputFilter):
                 'was_installed_by_default': setting.get('was_installed_by_default'),
                 'name': DictUtils.get_deep(setting, 'manifest.name'),
                 'description': DictUtils.get_deep(setting, 'manifest.description'),
-                'path': setting.get('path')
+                'path': setting.get('path'),
             }
             if blob.get('osxcollector_username'):
                 extension['osxcollector_username'] = blob['osxcollector_username']
@@ -53,5 +56,5 @@ def main():
     run_filter_main(FindExtensionsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

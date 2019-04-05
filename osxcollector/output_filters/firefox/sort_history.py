@@ -3,7 +3,12 @@
 #
 # SortHistoryFilter creates a clean sorted Firefox browser history and tags lines with {'osxcollector_browser_history': 'firefox'}
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import copy
+
+import six
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -44,15 +49,14 @@ class SortHistoryFilter(OutputFilter):
         """Join the 'visits' and 'urls' tables into a single browser history and timeline."""
         history = list()
 
-        for visit in self._visits_table.itervalues():
+        for visit in six.itervalues(self._visits_table):
             place = self._places_table.get(visit.get('place_id'))
             if place:
-                add_keys = [key for key in visit.keys() if key not in place.keys()]
+                add_keys = [key for key in visit if key not in place]
                 record = copy.deepcopy(place)
                 for key in add_keys:
                     record[key] = visit[key]
                 record['osxcollector_browser_history'] = 'firefox'
-
                 history.append(record)
 
         return sorted(history, key=lambda x: x['last_visit_date'], reverse=True)
@@ -86,5 +90,5 @@ def main():
     run_filter_main(SortHistoryFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

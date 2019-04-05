@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import testify as T
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from osxcollector.output_filters.related_files import RelatedFilesFilter
 from tests.output_filters.run_filter_test import assert_equal_sorted
@@ -15,12 +16,13 @@ class RelatedFilesFilterTest(RunFilterTest):
 
     """Created a RelateFilesFilter, calls run_test, and performs additional filter specific validation."""
 
-    @T.teardown
-    def teardown_outputfilter(self):
+    def teardown_method(self, method):
         self._output_filter = None
 
-    def _run_test(self, input_blobs=None, when=when_anytime, file_terms=None, expected_terms=None,
-                  expected_usernames=None, expected_is_related=None):
+    def _run_test(
+        self, input_blobs=None, when=when_anytime, file_terms=None, expected_terms=None,
+        expected_usernames=None, expected_is_related=None,
+    ):
         """Created a RelateFilesFilter, calls run_test, and performs additional filter specific validation.
 
         Args:
@@ -46,7 +48,7 @@ class RelatedFilesFilterTest(RunFilterTest):
         return output_blobs
 
 
-class CreateTermsTest(RelatedFilesFilterTest):
+class TestCreateTerms(RelatedFilesFilterTest):
 
     """Focuses on testing that terms are properly created."""
 
@@ -79,7 +81,7 @@ class CreateTermsTest(RelatedFilesFilterTest):
         self._run_test(input_blobs=[blob], file_terms=file_terms, expected_terms=expected, expected_usernames=expected_usernames)
 
 
-class FindUserNamesTest(RelatedFilesFilterTest):
+class TestFindUserNames(RelatedFilesFilterTest):
 
     """Focuses on ensuring that usernames are found so they can be ignored as terms."""
 
@@ -93,22 +95,22 @@ class FindUserNamesTest(RelatedFilesFilterTest):
             {'osxcollector_username': 'bob'},
             {'osxcollector_username': 'jim'},
             {'osxcollector_username': 'bob'},
-            {'banana': 'pants'}
+            {'banana': 'pants'},
         ]
         expected_usernames = ['bob', 'jim']
         self._run_test(input_blobs=blobs, expected_usernames=expected_usernames)
 
 
-class RelatedFilesFilterTest(RelatedFilesFilterTest):
+class TestRelatedFilesFilter(RelatedFilesFilterTest):
 
     """Tests the overall functionality of the filter."""
 
     def test_single_term(self):
         input_blobs = [
-            {'banana': '/var/bin/magic_value'}
+            {'banana': '/var/bin/magic_value'},
         ]
         expected_is_related = [
-            {'files': ['magic_value']}
+            {'files': ['magic_value']},
         ]
         file_terms = ['magic_value']
         self._run_test(input_blobs=input_blobs, file_terms=file_terms, expected_is_related=expected_is_related)
@@ -117,12 +119,12 @@ class RelatedFilesFilterTest(RelatedFilesFilterTest):
         input_blobs = [
             {'avocado': '/var/bin/magic/hat'},
             {'mango': '/var/bin/value/hat'},
-            {'shandy': '/var/bin/magic/value/hat'}
+            {'shandy': '/var/bin/magic/value/hat'},
         ]
         expected_is_related = [
             {'files': ['magic']},
             {'files': ['value']},
-            {'files': ['magic', 'value']}
+            {'files': ['magic', 'value']},
         ]
         file_terms = ['magic', 'value']
         self._run_test(input_blobs=input_blobs, file_terms=file_terms, expected_is_related=expected_is_related)
@@ -131,12 +133,12 @@ class RelatedFilesFilterTest(RelatedFilesFilterTest):
         input_blobs = [
             {'avocado': '/var/bin/magic/hat'},
             {'mango': '/var/bin/value/hat'},
-            {'shandy': '/var/bin/magic/value/hat'}
+            {'shandy': '/var/bin/magic/value/hat'},
         ]
         expected_is_related = [
             {'files': ['magic']},
             {'files': ['value']},
-            {'files': ['magic', 'value']}
+            {'files': ['magic', 'value']},
         ]
         file_terms = ['magic/value']
         self._run_test(input_blobs=input_blobs, file_terms=file_terms, expected_is_related=expected_is_related)
@@ -146,13 +148,13 @@ class RelatedFilesFilterTest(RelatedFilesFilterTest):
             {'file_path': '/var/bin/magic/value'},
             {'carrot': '/var/bin/magic/hat'},
             {'apple': '/var/bin/value/hat'},
-            {'lemmon': '/lime/rickey'}
+            {'lemmon': '/lime/rickey'},
         ]
         expected_is_related = [
             {'files': ['magic', 'value']},
             {'files': ['magic']},
             {'files': ['value']},
-            None
+            None,
         ]
         self._run_test(input_blobs=input_blobs, expected_is_related=expected_is_related)
 
@@ -161,13 +163,13 @@ class RelatedFilesFilterTest(RelatedFilesFilterTest):
             {'file_path': '/var/bin/magic/value', 'osxcollector_username': 'magic'},
             {'carrot': '/var/bin/magic/hat'},
             {'apple': '/var/bin/value/hat'},
-            {'lemmon': '/lime/rickey'}
+            {'lemmon': '/lime/rickey'},
         ]
         expected_is_related = [
             {'files': ['value']},
             None,
             {'files': ['value']},
-            None
+            None,
         ]
         self._run_test(input_blobs=input_blobs, expected_is_related=expected_is_related)
 
@@ -180,13 +182,13 @@ class RelatedFilesFilterTest(RelatedFilesFilterTest):
             {'file_path': '/var/bin/value'},
             {'carrot': '/var/bin/magic/hat'},
             {'apple': '/var/bin/value/hat'},
-            {'lemmon': '/lime/rickey'}
+            {'lemmon': '/lime/rickey'},
         ]
         expected_is_related = [
             {'files': ['magic']},
             None,
             {'files': ['magic']},
             None,
-            None
+            None,
         ]
         self._run_test(input_blobs=input_blobs, when=when_binbing, expected_is_related=expected_is_related)

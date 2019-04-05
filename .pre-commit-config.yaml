@@ -1,23 +1,36 @@
+exclude: '^tests/output_filters/data/.*$'
+repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: a10dec1998af6c70e26b8e6f419f93018b264253
+    rev: v2.1.0
     hooks:
-    -   id: autopep8-wrapper
-        args:
-        - -i
-        - --ignore=E501
     -   id: check-json
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
     -   id: name-tests-test
     -   id: requirements-txt-fixer
+    -   id: double-quote-string-fixer
     -   id: flake8
+    -   id: fix-encoding-pragma
+-   repo: git://github.com/pre-commit/mirrors-autopep8
+    rev: v1.4.3
+    hooks:
+    -   id: autopep8
 -   repo: git://github.com/asottile/reorder_python_imports
-    sha: f5c67b716c04babb6e8e80bb52e329ee7654b1b8
+    rev: v1.4.0
     hooks:
     -   id: reorder-python-imports
+        args: [
+            '--add-import', 'from __future__ import absolute_import',
+            '--add-import', 'from __future__ import unicode_literals',
+        ]
+        exclude: setup.py
+-   repo: git://github.com/asottile/add-trailing-comma
+    rev: v1.0.0
+    hooks:
+    -   id: add-trailing-comma
 -   repo: https://github.com/Yelp/detect-secrets
-    sha: 0.9.1
+    rev: v0.12.2
     hooks:
     -   id: detect-secrets
         args: ['--baseline', '.secrets.baseline']

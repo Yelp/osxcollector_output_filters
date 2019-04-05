@@ -3,6 +3,9 @@
 #
 # LookupDomainsFilter uses VirusTotal to lookup the values in 'osxcollector_domains' and add 'osxcollector_vtdomain' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from threat_intel.virustotal import VirusTotalApi
 
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -16,8 +19,10 @@ class LookupDomainsFilter(ThreatFeedFilter):
     """A class to lookup hashes using VirusTotal API."""
 
     def __init__(self, lookup_when=None, **kwargs):
-        super(LookupDomainsFilter, self).__init__('osxcollector_domains', 'osxcollector_vtdomain',
-                                                  lookup_when=lookup_when, name_of_api_key='virustotal', **kwargs)
+        super(LookupDomainsFilter, self).__init__(
+            'osxcollector_domains', 'osxcollector_vtdomain',
+            lookup_when=lookup_when, name_of_api_key='virustotal', **kwargs
+        )
         self._whitelist = create_blacklist(config_get_deep('domain_whitelist'))
 
     def _lookup_iocs(self, all_iocs, resource_per_req=25):
@@ -35,9 +40,9 @@ class LookupDomainsFilter(ThreatFeedFilter):
         cache_file_name = config_get_deep('virustotal.LookupDomainsFilter.cache_file_name', None)
         vt = VirusTotalApi(self._api_key, resource_per_req, cache_file_name=cache_file_name)
 
-        iocs = filter(lambda x: not self._whitelist.match_values(x), all_iocs)
+        iocs = [x for x in all_iocs if not self._whitelist.match_values(x)]
         reports = vt.get_domain_reports(iocs)
-        for domain in reports.keys():
+        for domain in reports:
             if not reports[domain]:
                 continue
 
@@ -99,7 +104,7 @@ class LookupDomainsFilter(ThreatFeedFilter):
             'Websense ThreatSeeker category',
             'Webutation domain info',
             'WOT domain info',
-            'TrendMicro category'
+            'TrendMicro category',
         ]
         categorization = {}
         for copy_key in categorization_keys:
@@ -123,5 +128,5 @@ def main():
     run_filter_main(LookupDomainsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

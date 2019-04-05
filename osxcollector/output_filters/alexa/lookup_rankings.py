@@ -3,6 +3,8 @@
 #
 # AlexaRankingFilter uses the AWIS API to lookup Alexa traffic rankings.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from threat_intel.alexaranking import AlexaRankingApi
 
@@ -16,11 +18,13 @@ class LookupRankingsFilter(ThreatFeedFilter):
     """A class to lookup traffic rankings using AWIS API."""
 
     def __init__(self, lookup_when=None, **kwargs):
-        super(LookupRankingsFilter, self).__init__('osxcollector_domains',
-                                                   'osxcollector_alexa_rank',
-                                                   lookup_when=lookup_when,
-                                                   name_of_api_key=None,
-                                                   **kwargs)
+        super(LookupRankingsFilter, self).__init__(
+            'osxcollector_domains',
+            'osxcollector_alexa_rank',
+            lookup_when=lookup_when,
+            name_of_api_key=None,
+            **kwargs
+        )
 
     def _lookup_iocs(self, domains, resource_per_req=25):
         """Caches the Alexa ranking info for a set of domains.
@@ -37,7 +41,7 @@ class LookupRankingsFilter(ThreatFeedFilter):
 
         iocs = domains
         reports = ar.get_alexa_rankings(iocs)
-        for domain in reports.keys():
+        for domain in reports:
             report = reports[domain]
             if report and self._should_store_ioc_info(report):
                 traffic_info[domain] = report
@@ -62,5 +66,5 @@ def main():
     run_filter_main(LookupRankingsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

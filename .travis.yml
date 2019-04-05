@@ -1,19 +1,23 @@
 language: python
-python:
-- '2.7'
+matrix:
+  include:
+    - env: TOXENV=py27
+      python: '2.7'
+    - env: TOXENV=py36
+      python: '3.6'
+    - env: TOXENV=pre-commit
 
-install:
-- sudo pip install tox-travis
+install: sudo pip install tox-travis
 
-script: make test
-
+script: tox
 deploy:
   provider: pypi
   user: yelplabs
+  skip_existing: true
+  distributions: "sdist bdist_wheel"
   password:
-    secure: O/8Fwyp4Hy1G0OAgoueVdGVarsCYNCI+/eFvlobJlEXaSJ+yBkYGJgN+tjRiwRkuk0f1Z7/jFFucvgnW+6NlM1yvtMLNRgqiqryXqabE55h+wBof9VpirIxmFeM8EXuB/pPOh7kzDIj8wG/ZUibT5z9HJH3g959KfogJlRkKZwXp8vG8kBErI5Qrw5emMz6PbyWwdDUjdXMuLXCa3v0kq7SDHV40qnH0YjjP6tWlTi8pT7lJKLtC6lrUOkDEL2CBM6qDeWH7ww8vtcPGX3ytVhtf1fnsl4I3Gc1BkP0WyskzGxyNMBr7P8Hpx3EfC/mQDt40aJMOCVRJyWLC3c6yM3WnwCdVobtK7ianfDD3ayNvhlwAZIH3vYOUJfheVgT/U7Y8xvVUV9phkn7aeDmyRzc4hkgAJFvfo2U4TdH7A43fyVx8pPBpboBAheuFYQ903caON3irw0TgErpsMvP9sXP3Ox0JNOsHB/YR0UyU3/t9yfHA7G8oWqoDFMhJGs91lTMYn0eZp7cRk/9GA5X/wL70spAWt0W9Irk8Wq8jTK1Tp5m0v/lgxSFO7HiypCofra10bkwXIXah0dfdaFg3SGl4CF0GPUM93XSq6VV/jmMQReiD3WBjZrVG3h0N7/vPwtXvYgUqszoWCTjlhz8mBmVwcLAf2Kr/SQFG0nofk6M=
+    secure: WMygawcYeJGbe4cJlQECKKEZJLYsirgutlihp8Yn4iAKRjpDFmOTwB0B8NjaYsB9pBvz7MLz913ukIhzsHhZLMYE6GRpwjiGfaSXupC4zDVkdi14KPJIo7dff/1p0rGGtZmYa/iohC/HDgbF4iXcBcwdzrvDBDqwPFaM/5J4LxF+KunXCVopsmQTkBEsMNz/K55By3xCO3qxupixTDYy+VOVv3F6Bs8hChqKmql9vvi2ZZPVq9y7io13T7JREKKv8ZOyIq+AGXtrZvnzVuNPfW6PE3eBUv2BUy0xEuwsqjX4goQ0bzRiVKS4XdIl8HmZD/aj2mkaXSw6HLST4+/+im2uNVIPHTEfyqDgUwtZInQF9zML3wGANGIfS+z1ZKfirSO0DiTKpFMkbiM5K0D+VRKFChblCOqQ5WiU9jhcLrHDHED7aLT7pIAlEcizeTpTwF9ZR5Eg48wB59A3q5b6aTsw1t9Q2kIyEnXHgf3JUGtRu0BO2ATGL324Dkzoa8DN2CeZ0F3fWCaI7gqFssrytDPwG+ct17yJkLQXnRTemFm/fCw9YC+onSufa+pV2qlRZRFywifgwIaAwL7hXC4w2qF4d5RzEOtCZjlmOBCLZ6/r/dwhnS+bBdHSuxxcfV1WB5RZLemqNJfbRdQheM0Ld6tzqZZRi5SB7gohnLEJWlc=
   on:
     tags: true
-    distributions: sdist bdist_wheel
     repo: Yelp/osxcollector_output_filters
-    branch: pypi-autodeploy
+    branch: master

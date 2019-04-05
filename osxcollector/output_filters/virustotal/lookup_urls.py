@@ -3,6 +3,9 @@
 #
 # LookupURLsFilter uses VirusTotal to lookup the URLs in 'LSQuarantineDataURLString' and add 'osxcollector_vturl' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import re
 
 from threat_intel import VirusTotalApi
@@ -20,9 +23,11 @@ class LookupURLsFilter(ThreatFeedFilter):
 
     def __init__(self, lookup_when=None, **kwargs):
         lookup_when_url_scheme_matches = self._generate_lookup_when(lookup_when)
-        super(LookupURLsFilter, self).__init__('LSQuarantineDataURLString', 'osxcollector_vturl',
-                                               lookup_when=lookup_when_url_scheme_matches,
-                                               name_of_api_key='virustotal', **kwargs)
+        super(LookupURLsFilter, self).__init__(
+            'LSQuarantineDataURLString', 'osxcollector_vturl',
+            lookup_when=lookup_when_url_scheme_matches,
+            name_of_api_key='virustotal', **kwargs
+        )
 
     def _generate_lookup_when(self, only_lookup_when):
         """Generates functions that checks whether the blob contains a valid URL
@@ -46,7 +51,7 @@ class LookupURLsFilter(ThreatFeedFilter):
         vt = VirusTotalApi(self._api_key, resource_per_req, cache_file_name=cache_file_name)
         reports = vt.get_url_reports(all_iocs)
 
-        for url in reports.keys():
+        for url in reports:
             report = reports[url]
             if not report:
                 continue
@@ -82,7 +87,7 @@ class LookupURLsFilter(ThreatFeedFilter):
             'permalink',
             'positives',
             'total',
-            'response_code'
+            'response_code',
         ]
 
         return dict([(key, report.get(key)) for key in copy_keys])
@@ -92,5 +97,5 @@ def main():
     run_filter_main(LookupURLsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

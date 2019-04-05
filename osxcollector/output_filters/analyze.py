@@ -13,7 +13,8 @@
 #  5. Take any domain or IP from the command line and use OpenDNS Investigate API to find all the domains
 #     related to those domains and all the domains related to those related domains - basically the 1st and 2nd
 #     generation related domains. Mark any lines where these domains appear.
-#  6. Lookup all sha1 hashes in ShadowServer's bin-test whitelist. Files that match both hash and filename are ignored by further filters.
+#  6. Lookup all sha1 hashes in ShadowServer's bin-test whitelist.
+#     Files that match both hash and filename are ignored by further filters.
 #  7. Lookup file hashes in VirusTotal and mark any lines with suspicious files hashes.
 #  8. Lookup all the domains in the file with OpenDNS Investigate. Categorize and score the domains.
 #     Mark all the lines that contain domains that were scored as "suspicious".
@@ -23,8 +24,12 @@
 # 12. Look at all the interesting lines in the file and try to summarize them in some very human readable output.
 # 13. Party!
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from argparse import ArgumentParser
 
+from osxcollector.output_filters.alexa.lookup_rankings import LookupRankingsFilter as ArLookupRankingsFilter
 from osxcollector.output_filters.base_filters.chain import ChainFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
 from osxcollector.output_filters.chrome.find_extensions import FindExtensionsFilter as ChromeExtensionsFilter
@@ -41,7 +46,6 @@ from osxcollector.output_filters.summary_filters.html import HtmlSummaryFilter
 from osxcollector.output_filters.summary_filters.text import TextSummaryFilter
 from osxcollector.output_filters.virustotal.lookup_domains import LookupDomainsFilter as VtLookupDomainsFilter
 from osxcollector.output_filters.virustotal.lookup_hashes import LookupHashesFilter as VtLookupHashesFilter
-from osxcollector.output_filters.alexa.lookup_rankings import LookupRankingsFilter as ArLookupRankingsFilter
 
 
 class AnalyzeFilter(ChainFilter):
@@ -52,7 +56,10 @@ class AnalyzeFilter(ChainFilter):
     effect the operations of the next filter.
     """
 
-    def __init__(self, no_opendns=False, no_virustotal=False, no_shadowserver=False, no_alexa=False, readout=False, **kwargs):
+    def __init__(
+        self, no_opendns=False, no_virustotal=False, no_shadowserver=False,
+        no_alexa=False, readout=False, **kwargs
+    ):
 
         filter_chain = []
 
@@ -71,22 +78,30 @@ class AnalyzeFilter(ChainFilter):
             if not no_shadowserver:
                 filter_chain.append(ShadowServerLookupHashesFilter(**kwargs))
             if not no_virustotal:
-                filter_chain.append(VtLookupHashesFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs))
+                filter_chain.append(
+                    VtLookupHashesFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs),
+                )
 
             # Find blacklisted stuff next. Finding blacklisted domains requires running FindDomainsFilter first.
             filter_chain.append(FindBlacklistedFilter(**kwargs))
 
-            # RelatedFilesFilter and OpenDnsRelatedDomainsFilter use command line args in addition to previous filter results to find
-            # lines of interest.
+            # RelatedFilesFilter and OpenDnsRelatedDomainsFilter use command line args in addition to previous filter
+            # results to find lines of interest.
             filter_chain.append(RelatedFilesFilter(when=AnalyzeFilter.find_related_when, **kwargs))
             if not no_opendns:
-                filter_chain.append(OpenDnsRelatedDomainsFilter(related_when=AnalyzeFilter.find_related_when, **kwargs))
+                filter_chain.append(
+                    OpenDnsRelatedDomainsFilter(related_when=AnalyzeFilter.find_related_when, **kwargs),
+                )
 
             # Lookup threat info on suspicious and related stuff
             if not no_opendns:
-                filter_chain.append(OpenDnsLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs))
+                filter_chain.append(
+                    OpenDnsLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_when_not_in_shadowserver, **kwargs),
+                )
             if not no_virustotal:
-                filter_chain.append(VtLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_domains_in_vt_when, **kwargs))
+                filter_chain.append(
+                    VtLookupDomainsFilter(lookup_when=AnalyzeFilter.lookup_domains_in_vt_when, **kwargs),
+                )
 
             # Sort browser history for maximum pretty
             filter_chain.append(FirefoxHistoryFilter(**kwargs))
@@ -105,30 +120,54 @@ class AnalyzeFilter(ChainFilter):
         """
         parser = ArgumentParser()
         group = parser.add_argument_group('AnalyzeFilter')
-        group.add_argument('--readout', dest='readout', action='store_true', default=False,
-                           help='[OPTIONAL] Skip the analysis and just output really readable analysis')
-        group.add_argument('--no-opendns', dest='no_opendns', action='store_true', default=False,
-                           help='[OPTIONAL] Don\'t run OpenDNS filters')
-        group.add_argument('--no-virustotal', dest='no_virustotal', action='store_true', default=False,
-                           help='[OPTIONAL] Don\'t run VirusTotal filters')
-        group.add_argument('--no-shadowserver', dest='no_shadowserver', action='store_true', default=False,
-                           help='[OPTIONAL] Don\'t run ShadowServer filters')
-        group.add_argument('--no-alexa', dest='no_alexa', action='store_true', default=False,
-                           help='[OPTIONAL] Don\'t run AlexaRanking filters')
-        group.add_argument('-M', '--monochrome', dest='monochrome', action='store_true', default=False,
-                           help='[OPTIONAL] Output monochrome analysis')
-        group.add_argument('--show-signature-chain', dest='show_signature_chain', action='store_true', default=False,
-                           help='[OPTIONAL] Output unsigned startup items and kexts.')
-        group.add_argument('--show-browser-ext', dest='show_browser_ext', action='store_true', default=False,
-                           help='[OPTIONAL] Output the list of installed browser extensions.')
-        group.add_argument('-t', '--text', dest='text_output_file', default=None,
-                           help='[OPTIONAL] Path to the output file where summary in plain text format will be written to.')
-        group.add_argument('-w', '--html', dest='html_output_file', default=None,
-                           help='[OPTIONAL] Path to the output file where summary in HTML format will be written to.')
-        group.add_argument('-c', '--group-by-iocs', dest='group_by_iocs', action='store_true', default=False,
-                           help='[OPTIONAL] Summarize the output grouped by IOCs instead of by threat indicators.')
-        group.add_argument('-k', '--group-key', dest='group_key', default=None,
-                           help='[OPTIONAL] If sorting by IOCs, select which key to group by (sha1/sha2/domain)')
+        group.add_argument(
+            '--readout', dest='readout', action='store_true', default=False,
+            help='[OPTIONAL] Skip the analysis and just output really readable analysis',
+        )
+        group.add_argument(
+            '--no-opendns', dest='no_opendns', action='store_true', default=False,
+            help='[OPTIONAL] Don\'t run OpenDNS filters',
+        )
+        group.add_argument(
+            '--no-virustotal', dest='no_virustotal', action='store_true', default=False,
+            help='[OPTIONAL] Don\'t run VirusTotal filters',
+        )
+        group.add_argument(
+            '--no-shadowserver', dest='no_shadowserver', action='store_true', default=False,
+            help='[OPTIONAL] Don\'t run ShadowServer filters',
+        )
+        group.add_argument(
+            '--no-alexa', dest='no_alexa', action='store_true', default=False,
+            help='[OPTIONAL] Don\'t run AlexaRanking filters',
+        )
+        group.add_argument(
+            '-M', '--monochrome', dest='monochrome', action='store_true', default=False,
+            help='[OPTIONAL] Output monochrome analysis',
+        )
+        group.add_argument(
+            '--show-signature-chain', dest='show_signature_chain', action='store_true', default=False,
+            help='[OPTIONAL] Output unsigned startup items and kexts.',
+        )
+        group.add_argument(
+            '--show-browser-ext', dest='show_browser_ext', action='store_true', default=False,
+            help='[OPTIONAL] Output the list of installed browser extensions.',
+        )
+        group.add_argument(
+            '-t', '--text', dest='text_output_file', default=None,
+            help='[OPTIONAL] Path to the output file where summary in plain text format will be written to.',
+        )
+        group.add_argument(
+            '-w', '--html', dest='html_output_file', default=None,
+            help='[OPTIONAL] Path to the output file where summary in HTML format will be written to.',
+        )
+        group.add_argument(
+            '-c', '--group-by-iocs', dest='group_by_iocs', action='store_true', default=False,
+            help='[OPTIONAL] Summarize the output grouped by IOCs instead of by threat indicators.',
+        )
+        group.add_argument(
+            '-k', '--group-key', dest='group_key', default=None,
+            help='[OPTIONAL] If sorting by IOCs, select which key to group by (sha1/sha2/domain)',
+        )
         return parser
 
     @staticmethod
@@ -138,7 +177,7 @@ class AnalyzeFilter(ChainFilter):
             'osxcollector_vtdomain',
             'osxcollector_opendns',
             'osxcollector_blacklist',
-            'osxcollector_related'
+            'osxcollector_related',
         ]
 
         return any([key in blob for key in _KEYS_FOR_SUMMARY])
@@ -178,5 +217,5 @@ def main():
     run_filter_main(AnalyzeFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

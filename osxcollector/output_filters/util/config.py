@@ -2,9 +2,16 @@
 #
 # Config is a very simplistic class for reading YAML config.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 import yaml
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 from osxcollector.output_filters.exceptions import MissingConfigError
 from osxcollector.output_filters.util.dict_utils import DictUtils
@@ -29,7 +36,7 @@ def _read_config():
         dict of config
     """
     with open(_config_file_path()) as source:
-        return yaml.load(source.read())
+        return yaml.load(source.read(), Loader=Loader)
 
 
 def _config_file_path():

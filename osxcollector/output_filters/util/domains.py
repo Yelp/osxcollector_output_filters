@@ -2,8 +2,12 @@
 #
 # Utilities for dealing with domain names
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import re
 
+import six
 import tldextract
 
 from osxcollector.output_filters.exceptions import BadDomainError
@@ -40,7 +44,7 @@ def clean_domain(unclean_domain):
     Raises:
         BadDomainError - when a clean domain can't be made
     """
-    if not isinstance(unclean_domain, unicode):
+    if not isinstance(unclean_domain, six.text_type):
         unclean_domain = unclean_domain.decode('utf-8', errors='ignore')
 
     unclean_domain = re.sub(r'^[^a-zA-Z0-9]*(.*?)[^a-zA-Z0-9]*$', r'\1', unclean_domain)
@@ -49,6 +53,7 @@ def clean_domain(unclean_domain):
     if bool(extracted.domain and extracted.suffix):
         start_index = 1 if not extracted.subdomain else 0
         domain = '.'.join(extracted[start_index:]).lstrip('.')
-        return domain.encode('ascii', errors='ignore')
+        return domain.encode('ascii', errors='ignore') if six.PY2 else \
+            domain.encode('utf8').decode('ascii', errors='ignore')
 
     raise BadDomainError(u'Can not clean {0} {1}'.format(unclean_domain, repr(extracted)))

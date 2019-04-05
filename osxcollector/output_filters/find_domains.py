@@ -3,10 +3,15 @@
 #
 # FindDomainsFilter looks for domains in all input lines and adds those domains into the 'osxcollector_domains' key.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import logging
 import re
-from urllib import unquote_plus
-from urlparse import urlsplit
+
+import six
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import urlsplit
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.base_filters.output_filter import run_filter_main
@@ -46,21 +51,21 @@ class FindDomainsFilter(OutputFilter):
             val: The value, could be of any type
             key: A string key associated with the value.
         """
-        if isinstance(val, basestring):
+        if isinstance(val, six.string_types):
             if key in self.HOST_KEYS:
                 self._add_domain(val)
                 return
             if -1 != self.SCHEMES.search(val):
                 # Sometimes values are complex strings, like JSON or pickle encoded stuff.
                 # Try splitting the string on non-URL related punctuation
-                for maybe_url in re.split('[ \'\(\)\"\[\]\{\}\;\n\t#@\^&\*=]+', val):
+                for maybe_url in re.split(r'[ \'\(\)\"\[\]\{\}\;\n\t#@\^&\*=]+', val):
                     domain = self._url_to_domain(maybe_url)
                     self._add_domain(domain)
         elif isinstance(val, list):
             for elem in val:
                 self._look_for_domains(elem)
         elif isinstance(val, dict):
-            for key, elem in val.iteritems():
+            for key, elem in six.iteritems(val):
                 self._look_for_domains(elem, key)
                 self._look_for_domains(key)
 
@@ -107,5 +112,5 @@ def main():
     run_filter_main(FindDomainsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

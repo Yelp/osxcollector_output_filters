@@ -11,8 +11,12 @@
 #     }
 # }
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from argparse import ArgumentParser
 
+import six
 from threat_intel.opendns import InvestigateApi
 
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
@@ -43,12 +47,14 @@ class RelatedDomainsFilter(OutputFilter):
     ```
     """
 
-    def __init__(self,
-                 initial_domains=None,
-                 initial_ips=None,
-                 generations=DEFAULT_RELATED_DOMAINS_GENERATIONS,
-                 related_when=None,
-                 **kwargs):
+    def __init__(
+        self,
+        initial_domains=None,
+        initial_ips=None,
+        generations=DEFAULT_RELATED_DOMAINS_GENERATIONS,
+        related_when=None,
+        **kwargs
+    ):
         """Initializes the RelatedDomainsFilter.
 
         Args:
@@ -120,12 +126,18 @@ class RelatedDomainsFilter(OutputFilter):
     def get_argument_parser(self):
         parser = ArgumentParser()
         group = parser.add_argument_group('opendns.RelatedDomainsFilter')
-        group.add_argument('-d', '--domain', dest='initial_domains', default=[], action='append',
-                           help='[OPTIONAL] Suspicious domains to use in pivoting.  May be specified more than once.')
-        group.add_argument('-i', '--ip', dest='initial_ips', default=[], action='append',
-                           help='[OPTIONAL] Suspicious IP to use in pivoting.  May be specified more than once.')
-        group.add_argument('--related-domains-generations', dest='generations', default=DEFAULT_RELATED_DOMAINS_GENERATIONS,
-                           help='[OPTIONAL] How many generations of related domains to lookup with OpenDNS')
+        group.add_argument(
+            '-d', '--domain', dest='initial_domains', default=[], action='append',
+            help='[OPTIONAL] Suspicious domains to use in pivoting.  May be specified more than once.',
+        )
+        group.add_argument(
+            '-i', '--ip', dest='initial_ips', default=[], action='append',
+            help='[OPTIONAL] Suspicious IP to use in pivoting.  May be specified more than once.',
+        )
+        group.add_argument(
+            '--related-domains-generations', dest='generations', default=DEFAULT_RELATED_DOMAINS_GENERATIONS,
+            help='[OPTIONAL] How many generations of related domains to lookup with OpenDNS',
+        )
         return parser
 
     def _filter_domains_by_whitelist(self, domains):
@@ -136,7 +148,7 @@ class RelatedDomainsFilter(OutputFilter):
         Returns:
             An enumerable of domains
         """
-        return filter(lambda x: not self._whitelist.match_values(x), list(domains))
+        return [x for x in list(domains) if not self._whitelist.match_values(x)]
 
     def _perform_lookup_for_all_domains(self, domains_to_lookup, ips_to_lookup):
         """Lookup all the domains related to the input domains or IPs.
@@ -223,7 +235,7 @@ class RelatedDomainsFilter(OutputFilter):
         """
         domains = set()
 
-        for domain, cooccurence in cooccurrence_info.iteritems():
+        for domain, cooccurence in six.iteritems(cooccurrence_info):
             for occur_domain in cooccurence.get('pfs2', []):
                 for elem in expand_domain(occur_domain[0]):
                     domains.add(elem)
@@ -240,7 +252,7 @@ class RelatedDomainsFilter(OutputFilter):
         """
         domains = set()
 
-        for ip, rr_history in rr_history_info.iteritems():
+        for ip, rr_history in six.iteritems(rr_history_info):
             for rr_domain in rr_history.get('rrs', []):
                 for elem in expand_domain(rr_domain['rr']):
                     domains.add(elem)
@@ -252,5 +264,5 @@ def main():
     run_filter_main(RelatedDomainsFilter)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

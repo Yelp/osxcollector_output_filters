@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from osxcollector.output_filters.virustotal.lookup_hashes import LookupHashesFilter
 from tests.output_filters.run_filter_test import RunFilterTest
 
 
-class LookupHashesFilterTest(RunFilterTest):
+class TestLookupHashesFilter(RunFilterTest):
 
     def test_no_hashes(self):
         input_blobs = [
             {'fungo': 'dingo', 'bingo': [11, 37], 'banana': {'a': 11}},
-            {'span': 'div', 'head': ['tail', 22], 'orange': {'lemmon': 'zits'}}
+            {'span': 'div', 'head': ['tail', 22], 'orange': {'lemmon': 'zits'}},
         ]
         self.run_test(LookupHashesFilter, input_blobs=input_blobs, expected_output_blobs=input_blobs)
 
     def test_benign_hashes(self):
         input_blobs = [
             {'sha2': 'b8d99a20b148b6906977922ce2f964748c70cc36d5c5806a5c41ac9cb50f16d7', 'dingo': 'bingo', 'apple': [3, 14]},
-            {'sha2': '52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c', 'bingo': 'bongo', 'orange': 'banana'}
+            {'sha2': '52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c', 'bingo': 'bongo', 'orange': 'banana'},
         ]
         self.run_test(LookupHashesFilter, input_blobs=input_blobs, expected_output_blobs=input_blobs)
 
     def test_suspicious_hashes(self):
         input_blobs = [
             {'sha2': 'b779bafdf61b74784f2d3601ed663d7476da9ad4182601b8ca54fd4fbe1aa302', 'dingo': 'bingo', 'apple': [3, 14]},
-            {'sha2': '6e87855371171d912dd866e8d7747bf965c80053f83259827a55826ca38a9360', 'bingo': 'bongo', 'orange': 'banana'}
+            {'sha2': '6e87855371171d912dd866e8d7747bf965c80053f83259827a55826ca38a9360', 'bingo': 'bongo', 'orange': 'banana'},
         ]
         expected_vthashes = [
             [
@@ -36,8 +39,8 @@ class LookupHashesFilterTest(RunFilterTest):
                     'b779bafdf61b74784f2d3601ed663d7476da9ad4182601b8ca54fd4fbe1aa302/analysis/1273894724/',
                     'total': 40,
                     'positives': 40,
-                    'response_code': 1
-                }
+                    'response_code': 1,
+                },
             ],
             [
                 {
@@ -50,9 +53,9 @@ class LookupHashesFilterTest(RunFilterTest):
                     '6e87855371171d912dd866e8d7747bf965c80053f83259827a55826ca38a9360/analysis/1273894724/',
                     'total': 40,
                     'positives': 40,
-                    'response_code': 1
-                }
-            ]
+                    'response_code': 1,
+                },
+            ],
         ]
         output_blobs = self.run_test(LookupHashesFilter, input_blobs=input_blobs)
         self.assert_key_added_to_blob('osxcollector_vthash', expected_vthashes, input_blobs, output_blobs)

@@ -21,7 +21,7 @@ blacklists:
     blacklist_file_path: "/tmp/hash_blacklist.txt"
     blacklist_is_regex: False
  -  blacklist_name: "domains"
-    blacklist_keys: 
+    blacklist_keys:
      - "osxcollector_domains"
     blacklist_file_path: "/tmp/domain_blacklist.txt"
     blacklist_is_regex: False

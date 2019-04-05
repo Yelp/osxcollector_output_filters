@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from osxcollector.output_filters.find_domains import FindDomainsFilter
 from tests.output_filters.run_filter_test import RunFilterTest
 
 
-class FindDomainsFilterTest(RunFilterTest):
+class TestFindDomainsFilter(RunFilterTest):
 
     """Tests many variants of blobs with a domain in them."""
 
@@ -46,7 +49,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'dingo.com',
             'example.com',
             'www.dingo.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -54,7 +57,7 @@ class FindDomainsFilterTest(RunFilterTest):
         input_blob = {'fungo': 'http%3A//www.example.com'}
         expected_domains = [
             'example.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -64,7 +67,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'dingo.co.uk',
             'example.com',
             'www.dingo.co.uk',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -72,7 +75,7 @@ class FindDomainsFilterTest(RunFilterTest):
         input_blob = {'http://www.example.com': 'zungo'}
         expected_domains = [
             'example.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -82,7 +85,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'example.com',
             'sample.org',
             'www.example.com',
-            'www.zzz.sample.org'
+            'www.zzz.sample.org',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -92,7 +95,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'example.com',
             'sample.org',
             'www.example.com',
-            'www.zzz.sample.org'
+            'www.zzz.sample.org',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -100,8 +103,8 @@ class FindDomainsFilterTest(RunFilterTest):
         input_blob = {
             'fungo': [
                 {'http://www.example.com': 'https://www.zzz.sample.org'},
-                {'a': 'https://www.dingo.co.uk'}
-            ]
+                {'a': 'https://www.dingo.co.uk'},
+            ],
         }
         expected_domains = [
             'dingo.co.uk',
@@ -109,7 +112,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'sample.org',
             'www.dingo.co.uk',
             'www.example.com',
-            'www.zzz.sample.org'
+            'www.zzz.sample.org',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -120,8 +123,8 @@ class FindDomainsFilterTest(RunFilterTest):
                 '(http://www.example2.com)',
                 ';http://www.example3.com\n',
                 'http://example4.com.',
-                '#@^%$*http://www.xxx.yyy.zzz.example.com/fungo/digno'
-            ]
+                '#@^%$*http://www.xxx.yyy.zzz.example.com/fungo/digno',
+            ],
         }
         expected_domains = [
             'example.com',
@@ -131,7 +134,7 @@ class FindDomainsFilterTest(RunFilterTest):
             'www.example.com',
             'www.example2.com',
             'www.example3.com',
-            'www.xxx.yyy.zzz.example.com'
+            'www.xxx.yyy.zzz.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -139,7 +142,7 @@ class FindDomainsFilterTest(RunFilterTest):
         input_blob = {'host': 'www.example.com'}
         expected_domains = [
             'example.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -148,11 +151,11 @@ class FindDomainsFilterTest(RunFilterTest):
             'host': 'www.example.com',
             'another_thing': 'http://www.example.com',
             'https://www.example.com': True,
-            'dictation': {'threepete': ['ftp://example.com', 'http://example.com', 'https://www.example.com']}
+            'dictation': {'threepete': ['ftp://example.com', 'http://example.com', 'https://www.example.com']},
         }
         expected_domains = [
             'example.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 
@@ -160,7 +163,7 @@ class FindDomainsFilterTest(RunFilterTest):
         input_blob = {'host': 'https://www.example.com'}
         expected_domains = [
             'example.com',
-            'www.example.com'
+            'www.example.com',
         ]
         self._run_test(input_blob, expected_domains)
 

@@ -2,9 +2,14 @@
 #
 # Utilities for dealing with blacklists
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import logging
 import re
 from collections import namedtuple
+
+import six
 
 from osxcollector.output_filters.exceptions import BadDomainError
 from osxcollector.output_filters.exceptions import MissingConfigError
@@ -25,7 +30,7 @@ def create_blacklist(config_chunk):
         MissingConfigError - when required key does not exist.
     """
     required_keys = ['blacklist_name', 'blacklist_keys', 'blacklist_file_path']
-    if not all([key in config_chunk.keys() for key in required_keys]):
+    if not all([key in config_chunk for key in required_keys]):
         raise MissingConfigError('Blacklist config is missing a required key.\nRequired keys are: {0}'.format(repr(required_keys)))
 
     if not isinstance(config_chunk['blacklist_keys'], list):
@@ -66,7 +71,7 @@ class Blacklist(object):
                     self._blacklisted_values.append(line)
 
         self._blacklisted_values = [self._convert_to_matching_term(val) for val in self._blacklisted_values]
-        self._blacklisted_values = filter(None, self._blacklisted_values)
+        self._blacklisted_values = [x for x in self._blacklisted_values if x]
 
     def _read_blacklist_file_contents(self):
         try:
@@ -90,14 +95,15 @@ class Blacklist(object):
             try:
                 domain = clean_domain(blacklisted_value)
             except BadDomainError:
-                if not isinstance(blacklisted_value, unicode):
+                if not isinstance(blacklisted_value, six.text_type):
                     blacklisted_value = blacklisted_value.decode('utf8')
                 logging.warning(
                     u'Blacklisted value "{0}" cannot be resolved as a domain name'
-                    .format(blacklisted_value))
+                    .format(blacklisted_value),
+                )
                 return None
 
-            blacklisted_value = '^(.+\.)*{0}$'.format(re.escape(domain))
+            blacklisted_value = r'^(.+\.)*{0}$'.format(re.escape(domain))
 
         if self._is_regex:
             blacklisted_value = re.compile(blacklisted_value)

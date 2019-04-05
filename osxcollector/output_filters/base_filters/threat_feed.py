@@ -2,6 +2,11 @@
 #
 # ThreatFeedFilter is a base class to find info on IOCs using some random API.
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import six
+
 from osxcollector.output_filters.base_filters.output_filter import OutputFilter
 from osxcollector.output_filters.util.config import config_get_deep
 
@@ -78,7 +83,7 @@ class ThreatFeedFilter(OutputFilter):
         """
         if self._ioc_key in blob and (not self._lookup_when or self._lookup_when(blob)):
             ioc_list = blob[self._ioc_key]
-            if isinstance(ioc_list, basestring):
+            if isinstance(ioc_list, six.string_types):
                 ioc_list = [ioc_list]
 
             if len(ioc_list) > 10:
@@ -115,7 +120,7 @@ class ThreatFeedFilter(OutputFilter):
         all_threat_info = self._lookup_iocs(self.ioc_set)
         for blob in self._blobs_with_iocs:
             ioc_list = blob[self._ioc_key]
-            if isinstance(ioc_list, basestring):
+            if isinstance(ioc_list, six.string_types):
                 ioc_list = [ioc_list]
 
             for ioc in ioc_list:
