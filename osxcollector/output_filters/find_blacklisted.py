@@ -23,17 +23,18 @@ class FindBlacklistedFilter(OutputFilter):
         blacklist_name       - [REQUIRED] the name of the blacklist
         blacklist_keys       - [REQUIRED] get the value of these keys and compare against the blacklist
         blacklist_is_regex   - [REQUIRED] should the values in the blacklist file be treated as regex
-        blacklist_file_path  - [REQUIRED] path to a file with the actual values to blacklist
+        blacklist_file_path  - [REQUIRED if no blacklist_data_feed] path to a file with the actual values to blacklist
+        blacklist_data_feed  - [REQUIRED if no blacklist_file_path] name of the data feed from which data is read
         blacklist_is_domains - [OPTIONAL] interpret values as domains and do some smart regex and subdomain stuff with them
     """
 
     def __init__(self, **kwargs):
         super(FindBlacklistedFilter, self).__init__(**kwargs)
-        self._blacklists = self._init_blacklists()
-
-    def _init_blacklists(self):
-        """Reads the config and builds a list of blacklists."""
-        return [create_blacklist(config_chunk) for config_chunk in config_get_deep('blacklists')]
+        data_feeds = kwargs.get('data_feeds', {})
+        self._blacklists = [
+            create_blacklist(config_chunk, data_feeds)
+            for config_chunk in config_get_deep('blacklists')
+        ]
 
     def filter_line(self, blob):
         """Find blacklisted values in a line.

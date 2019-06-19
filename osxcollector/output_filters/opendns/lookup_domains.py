@@ -77,7 +77,9 @@ class LookupDomainsFilter(ThreatFeedFilter):
             'osxcollector_domains', 'osxcollector_opendns',
             lookup_when=lookup_when, name_of_api_key='opendns', **kwargs
         )
-        self._whitelist = create_blacklist(config_get_deep('domain_whitelist'))
+        self._whitelist = create_blacklist(
+            config_get_deep('domain_whitelist'), kwargs.get('data_feeds', {}),
+        )
 
     def _lookup_iocs(self, all_iocs):
         """Caches the OpenDNS info for a set of domains.

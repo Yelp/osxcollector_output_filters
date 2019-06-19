@@ -9,7 +9,6 @@ from mock import call
 from mock import patch
 
 from osxcollector.output_filters.exceptions import MissingConfigError
-from osxcollector.output_filters.util.blacklist import Blacklist
 from osxcollector.output_filters.util.blacklist import create_blacklist
 
 
@@ -24,8 +23,9 @@ class TestCreateBlacklist:
             # Cars
             'corolla', 'datsun',
         ]
-        with patch.object(
-            Blacklist, '_read_blacklist_file_contents', return_value=file_contents,
+        with patch(
+            'osxcollector.output_filters.util.blacklist._read_blacklist_file',
+            return_value=file_contents,
         ) as file_contents:
             yield file_contents
 
@@ -36,6 +36,11 @@ class TestCreateBlacklist:
             'blacklist_keys': ['fruit_name'],
             'blacklist_file_path': '/who/cares/I/mock/this.txt',
         }
+
+    @pytest.fixture(scope='module', autouse=True)
+    def mock_exists(self):
+        with patch('os.path.exists', return_value=True):
+            yield
 
     def test_only_required_keys(self, blacklist_data):
         blacklist = create_blacklist(blacklist_data)
@@ -50,6 +55,11 @@ class TestCreateBlacklist:
             del _blacklist_data[key]
             with pytest.raises(MissingConfigError):
                 create_blacklist(_blacklist_data)
+
+    def test_missing_data_input(self, blacklist_data):
+        blacklist_data.pop('blacklist_file_path')
+        with pytest.raises(MissingConfigError):
+            create_blacklist(blacklist_data)
 
     def test_required_with_two_keys(self, blacklist_data):
         blacklist_data['blacklist_keys'] = ['fruit_name', 'car_name']
@@ -82,8 +92,8 @@ class TestCreateBlacklist:
         unicode_domain_3 = 'иelф.р'
         unicode_domains = [unicode_domain_1, unicode_domain_2, unicode_domain_3]
         blacklist_data['blacklist_is_domains'] = True
-        with patch.object(
-            Blacklist, '_read_blacklist_file_contents',
+        with patch(
+            'osxcollector.output_filters.util.blacklist._read_blacklist_file',
             return_value=unicode_domains,
         ):
             with patch('logging.warning', autospec=True) as patched_logging_warning:
@@ -183,6 +193,35 @@ class TestCreateBlacklist:
         for blob in bad_blobs:
             assert not blacklist.match_line(blob)
 
+    def test_match_domains_data_feed(self, blacklist_data):
+        good_blobs = [
+            {'fruit_name': 'apple.com'},
+            {'fruit_name': 'www.apple.com'},
+            {'fruit_name': 'www.another-thing.apple.com'},
+        ]
+
+        bad_blobs = [
+            {'fruit_name': 'cran-apple.com'},
+            {'fruit_name': 'apple.org'},
+            {'fruit_name': 'apple.com.jp'},
+            {'car_name': 'apple.com'},
+        ]
+        blacklist_data['blacklist_is_domains'] = True
+        blacklist_data['blacklist_data_feed'] = 'domain_list'
+        blacklist_data.pop('blacklist_file_path')
+
+        def mock_generator():
+            for domain in ['apple.com']:
+                yield domain
+
+        blacklist = create_blacklist(
+            blacklist_data, {'domain_list': mock_generator},
+        )
+        for blob in good_blobs:
+            assert blacklist.match_line(blob)
+        for blob in bad_blobs:
+            assert not blacklist.match_line(blob)
+
     # TODO: Refactor OSXCollector Output Filters to work with unicode-based domains
     def test_log_unicode_domain(self):
         config_chunk = {
@@ -192,8 +231,9 @@ class TestCreateBlacklist:
             'blacklist_is_domains': True,
         }
         file_contents = ['Bücher.tld', 'yelp.公司', 'www.Yülp.tld', 'иelф.р']
-        with patch.object(
-            Blacklist, '_read_blacklist_file_contents', return_value=file_contents,
+        with patch(
+            'osxcollector.output_filters.util.blacklist._read_blacklist_file',
+            return_value=file_contents,
         ), patch('logging.warning', autospec=True) as patched_logging_warning:
             blacklist = create_blacklist(config_chunk)
             assert patched_logging_warning.call_count == 4

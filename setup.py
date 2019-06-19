@@ -8,7 +8,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='osxcollector_output_filters',
-    version='1.1.0',
+    version='1.1.1',
     author='Yelp Security',
     author_email='opensource@yelp.com',
     description='Filters that process and transform the output of OSXCollector',
@@ -20,6 +20,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     provides=['osxcollector'],
     install_requires=[
+        'PyYAML>=5.0',
         'threat_intel',
         'tldextract',
         'simplejson',
