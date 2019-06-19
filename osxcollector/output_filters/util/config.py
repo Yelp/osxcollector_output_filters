@@ -9,9 +9,9 @@ import os
 
 import yaml
 try:
-    from yaml import CLoader as Loader
+    from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import Loader
+    from yaml import SafeLoader
 
 from osxcollector.output_filters.exceptions import MissingConfigError
 from osxcollector.output_filters.util.dict_utils import DictUtils
@@ -36,7 +36,7 @@ def _read_config():
         dict of config
     """
     with open(_config_file_path()) as source:
-        return yaml.load(source.read(), Loader=Loader)
+        return yaml.load(source.read(), Loader=SafeLoader)
 
 
 def _config_file_path():

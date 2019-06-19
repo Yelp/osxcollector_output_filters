@@ -1,3 +1,4 @@
+PyYAML==5.1
 simplejson==3.10.0
 six==1.12.0
 threat_intel==0.1.29

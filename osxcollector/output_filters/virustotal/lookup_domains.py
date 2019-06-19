@@ -23,7 +23,9 @@ class LookupDomainsFilter(ThreatFeedFilter):
             'osxcollector_domains', 'osxcollector_vtdomain',
             lookup_when=lookup_when, name_of_api_key='virustotal', **kwargs
         )
-        self._whitelist = create_blacklist(config_get_deep('domain_whitelist'))
+        self._whitelist = create_blacklist(
+            config_get_deep('domain_whitelist'), kwargs.get('data_feeds', {}),
+        )
 
     def _lookup_iocs(self, all_iocs, resource_per_req=25):
         """Caches the VirusTotal info for a set of domains.

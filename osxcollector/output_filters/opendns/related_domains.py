@@ -67,7 +67,9 @@ class RelatedDomainsFilter(OutputFilter):
               the list of related domains.
         """
         super(RelatedDomainsFilter, self).__init__(**kwargs)
-        self._whitelist = create_blacklist(config_get_deep('domain_whitelist'))
+        self._whitelist = create_blacklist(
+            config_get_deep('domain_whitelist'), kwargs.get('data_feeds', {}),
+        )
 
         cache_file_name = config_get_deep('opendns.RelatedDomainsFilter.cache_file_name', None)
         self._investigate = InvestigateApi(config_get_deep('api_key.opendns'), cache_file_name=cache_file_name)
