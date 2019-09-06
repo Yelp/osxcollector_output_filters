@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import sys
 from numbers import Number
 
 import six
@@ -64,14 +63,8 @@ class TextSummaryFilter(SummaryFilter):
 
     def _write(self, msg, color=END_COLOR):
         if not self._monochrome:
-            self._output_stream.write(color)
-        try:
-            self._output_stream.write(msg.encode('utf-8', errors='ignore'))
-        except UnicodeDecodeError as err:
-            self._output_stream.write(msg)
-            sys.stderr.write('Unicode decode error: {0}'.format(err))
-        if not self._monochrome:
-            self._output_stream.write(self.END_COLOR)
+            msg = color + msg + self.END_COLOR
+        super(TextSummaryFilter, self)._write(msg)
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.

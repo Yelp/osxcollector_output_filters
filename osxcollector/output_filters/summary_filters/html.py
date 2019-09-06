@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import sys
 from numbers import Number
 
 import six
@@ -76,16 +75,6 @@ class HtmlSummaryFilter(SummaryFilter):
                 self._iocs.append(blob)
 
         return blob
-
-    def _write(self, text):
-        try:
-            self._output_stream.write(text.encode('utf-8', errors='replace'))
-        except UnicodeDecodeError as err:
-            self._output_stream.write(text)
-            sys.stderr.write(
-                'Unicode decode error when encoding text:\n{0}\nError:\n{1}\n'
-                .format(text, err),
-            )
 
     def end_of_lines(self):
         """Called after all lines have been fed to filter_output_line.

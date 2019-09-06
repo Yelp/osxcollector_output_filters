@@ -46,6 +46,11 @@ class SummaryFilter(OutputFilter):
                 self._output_stream = summary_output_file
         else:
             self._output_stream = sys.stdout
+        self._output_is_binary = 'b' in getattr(self._output_stream, 'mode', '').lower() \
+            or isinstance(self._output_stream, six.BytesIO)
+
+    def _write(self, data):
+        self._output_stream.write(data.encode('utf8') if self._output_is_binary else data)
 
     def __del__(self):
         self._close_output_stream()
